@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 
-from fiber_processing import remove_fiber
+from src.fiber_processing import remove_fiber
 from interpolate_near_tube import process_highlights
-from tube_analysis import get_bound_circ
+from src.tube_analysis import get_bound_circ
 
 
 def find_epoxy(img, img_tube, tube_radius, slice_num, num_wedges):
