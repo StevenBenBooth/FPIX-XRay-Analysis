@@ -1,8 +1,11 @@
 import cv2
+import numpy as np
 import pandas as pd
 import os
 from os.path import join
 from tqdm import tqdm
+
+# from PIL import Image
 
 from epoxy import find_epoxy
 from stat_tracker import StatTracker
@@ -19,14 +22,11 @@ files = os.listdir(base_path)
 tube_files = os.listdir(tube_path)
 
 
-def person_output(img, epoxy_mask, circle):
-    """Takes in the raw image, epoxy mask, and circle to make a nice processed image"""
+def person_output(img, color, epoxy_mask, circle):
+    """Takes in the raw image, base color, epoxy mask, and circle to make a nice processed image"""
 
     x, y, r = circle
-    red = cv2.imread("Resources/red.png")[
-        100:350, 75:575
-    ]  # Needs same dim as cropped img
-    a = cv2.bitwise_and(img, red, mask=epoxy_mask)
+    a = cv2.bitwise_and(img, color, mask=epoxy_mask)
     epoxy_mask = 255 - epoxy_mask
     b = cv2.bitwise_and(img, img, mask=epoxy_mask)
     pretty = cv2.bitwise_or(a, b)
@@ -61,6 +61,8 @@ total_slices = len(files)
 tracker = StatTracker.get_instance(precision, total_slices)
 rad = pick_radius(cv2.imread(join(tube_path, tube_files[0]))[100:350, 75:575])
 
+
+red = np.full((250, 500, 3), [0, 0, 255], dtype=np.uint8)
 for i in tqdm(range(total_slices)):
     tube_raw = cv2.imread(join(tube_path, tube_files[i]))
     img_raw = cv2.imread(join(base_path, files[i]))
@@ -74,7 +76,7 @@ for i in tqdm(range(total_slices)):
     epox, circle = find_epoxy(img_cropped, tube_cropped, rad, i, precision)
     cv2.imwrite(
         processed_path + "\\processed_" + files[i],
-        person_output(img_cropped, epox, circle),
+        person_output(img_cropped, red, epox, circle),
     )
 
 
