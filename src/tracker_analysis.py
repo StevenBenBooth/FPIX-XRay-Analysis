@@ -21,13 +21,22 @@ def save_png_to_gif(folder, save_path, duration=30):
     assert save_path.endswith(".gif"), "Save path must end in .gif"
     frames = []
     for file in os.listdir(folder):
-        assert file.endswith(".png") or file.endswith(".jpg"), "Files to be combined must be PNG or JPEG format"
-        new_frame = Image.open(join(folder, file))  # Can this read other file formats as well?
+        assert file.endswith(".png") or file.endswith(
+            ".jpg"
+        ), "Files to be combined must be PNG or JPEG format"
+        new_frame = Image.open(
+            join(folder, file)
+        )  # Can this read other file formats as well?
         frames.append(new_frame)
 
     # Save into a GIF file that loops forever
-    frames[0].save(save_path, format='GIF',
-                   append_images=frames[1:], save_all=True, duration=duration)
+    frames[0].save(
+        save_path,
+        format="GIF",
+        append_images=frames[1:],
+        save_all=True,
+        duration=duration,
+    )
 
 
 def save_coverage_stats(source, save_folder, col_count):
@@ -47,8 +56,11 @@ def save_coverage_stats(source, save_folder, col_count):
 
     slice_intensities = np.round(np.sum(array, 0) / rows, 4)
 
-    to_write = open(join(save_folder, "coverage stats.txt"), 'w')
-    to_write.write("This is the total tube coverage: " + str(np.round(np.sum(array) / (cols * rows), 4)))
+    to_write = open(join(save_folder, "coverage stats.txt"), "w")
+    to_write.write(
+        "This is the total tube coverage: "
+        + str(np.round(np.sum(array) / (cols * rows), 4))
+    )
     to_write.write("\nList of intensities by slice: " + str(slice_intensities))
 
     img = 255 * np.ones((300, 300, 3), np.uint8)
@@ -58,7 +70,9 @@ def save_coverage_stats(source, save_folder, col_count):
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
             if annulus[i][j] == 255:
-                R, G, B = cm.cividis(slice_intensities[int(get_angle(i, j, center) / slice_angle)])[:3]
+                R, G, B = cm.cividis(
+                    slice_intensities[int(get_angle(i, j, center) / slice_angle)]
+                )[:3]
 
-                img[i][j] = ([255 * a for a in [B, G, R]])
+                img[i][j] = [255 * a for a in [B, G, R]]
     cv2.imwrite(join(save_folder, "heatmap.png"), img)

@@ -3,8 +3,17 @@ from crust_slices import get_crust_masks
 from stat_tracker import StatTracker
 
 
-def process_highlights(start_epoxy_mask, highlights, tube_circle, slice_num, precision, thickness, thresh,
-                       epox_thresh, ker):
+def process_highlights(
+    start_epoxy_mask,
+    highlights,
+    tube_circle,
+    slice_num,
+    precision,
+    thickness,
+    thresh,
+    epox_thresh,
+    ker,
+):
     """
     Classifies the highlights around the tube as either epoxy or not. To do so, it looks in a small pizza-crust slice
     outwards from the highlight, and checks how much is epoxy and highlight vs nothingness. Currently, epox_thresh is
@@ -44,10 +53,17 @@ def process_highlights(start_epoxy_mask, highlights, tube_circle, slice_num, pre
         highlight_crust = cv2.bitwise_and(highlights, crust)
         prop_epoxy_crust = cv2.countNonZero(epoxy_crust) / tot
         prop_highlight_crust = cv2.countNonZero(highlight_crust) / tot
-        if prop_epoxy_crust + prop_highlight_crust >= thresh and prop_epoxy_crust >= epox_thresh:
-            result = cv2.bitwise_or(result, cv2.bitwise_or(epoxy_crust, highlight_crust))
+        if (
+            prop_epoxy_crust + prop_highlight_crust >= thresh
+            and prop_epoxy_crust >= epox_thresh
+        ):
+            result = cv2.bitwise_or(
+                result, cv2.bitwise_or(epoxy_crust, highlight_crust)
+            )
             StatTracker.get_instance().update_coverage(slice_num, i, True)
         else:
             StatTracker.get_instance().update_coverage(slice_num, i, False)
-    result = cv2.morphologyEx(result, cv2.MORPH_CLOSE, ker) # Closure to kill little holes
+    result = cv2.morphologyEx(
+        result, cv2.MORPH_CLOSE, ker
+    )  # Closure to kill little holes
     return result

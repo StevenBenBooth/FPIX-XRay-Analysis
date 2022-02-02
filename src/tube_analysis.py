@@ -48,13 +48,22 @@ def _get_bound_circ_cont(tube_img, radius):
 
 def _get_bound_circ_Hough(tube_img, min_radius):
     tube_gray = cv2.cvtColor(tube_img, cv2.COLOR_BGR2GRAY)
-    tube_opened = cv2.morphologyEx(tube_gray, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)))
-    tube_closed = cv2.morphologyEx(tube_opened, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (21, 21)),
-                                   iterations=4)
+    tube_opened = cv2.morphologyEx(
+        tube_gray, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    )
+    tube_closed = cv2.morphologyEx(
+        tube_opened,
+        cv2.MORPH_CLOSE,
+        cv2.getStructuringElement(cv2.MORPH_RECT, (21, 21)),
+        iterations=4,
+    )
     # Find circles
-    circles = cv2.HoughCircles(tube_closed, cv2.HOUGH_GRADIENT, 1.3, 1, minRadius=min_radius)
+    circles = cv2.HoughCircles(
+        tube_closed, cv2.HOUGH_GRADIENT, 1.3, 1, minRadius=min_radius
+    )
 
-    if circles is None: raise ValueError("Didn't find any circles")
+    if circles is None:
+        raise ValueError("Didn't find any circles")
     # Get the (x, y, r) as integers
     circles = np.round(circles[0, :]).astype("int")
 

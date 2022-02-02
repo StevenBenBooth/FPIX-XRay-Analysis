@@ -2,7 +2,9 @@ import cv2
 import numpy as np
 
 
-def remove_fiber(top_upper_bound, bottom_lower_bound, thickness, mask, close_ker, open_ker):
+def remove_fiber(
+    top_upper_bound, bottom_lower_bound, thickness, mask, close_ker, open_ker
+):
     """
     Processes the image to ignore the carbon fiber in the image classification.
 
@@ -19,14 +21,17 @@ def remove_fiber(top_upper_bound, bottom_lower_bound, thickness, mask, close_ker
     assert isinstance(top_upper_bound, int), "top_upper_bound must be an integer"
     assert isinstance(bottom_lower_bound, int), "bottom_lower_bound must be an integer"
     assert isinstance(thickness, int), "thickness must be an integer"
-    rough_mask = 255 * np.ones(mask.shape[:2], np.uint8)    # Not sure if 255 is necessary
+    rough_mask = 255 * np.ones(mask.shape[:2], np.uint8)  # Not sure if 255 is necessary
     shape = np.shape(mask)
     rows, cols = shape
     cv2.rectangle(rough_mask, (0, top_upper_bound), (cols, bottom_lower_bound), 0, -1)
     fiber_parts = cv2.bitwise_and(mask, rough_mask)
-    closed_fiber = cv2.morphologyEx(fiber_parts, cv2.MORPH_CLOSE, close_ker,
-                                    iterations=4)  # Closes up the fiber parts so the removal works better
-    top_coords, bottom_coords = _find_coords(top_upper_bound, bottom_lower_bound, closed_fiber, shape)
+    closed_fiber = cv2.morphologyEx(
+        fiber_parts, cv2.MORPH_CLOSE, close_ker, iterations=4
+    )  # Closes up the fiber parts so the removal works better
+    top_coords, bottom_coords = _find_coords(
+        top_upper_bound, bottom_lower_bound, closed_fiber, shape
+    )
 
     for j in range(cols):
         if top_coords[j] != -1:
@@ -38,7 +43,9 @@ def remove_fiber(top_upper_bound, bottom_lower_bound, thickness, mask, close_ker
             for i in range(b - thickness + 1, b + 1):
                 mask[i][j] = 0
 
-    result = cv2.morphologyEx(mask, cv2.MORPH_OPEN, open_ker, iterations=1)  # Clear little fiber artifacts
+    result = cv2.morphologyEx(
+        mask, cv2.MORPH_OPEN, open_ker, iterations=1
+    )  # Clear little fiber artifacts
     return result
 
 

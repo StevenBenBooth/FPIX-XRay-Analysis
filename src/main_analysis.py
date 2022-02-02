@@ -23,7 +23,9 @@ def person_output(img, epoxy_mask, circle):
     """Takes in the raw image, epoxy mask, and circle to make a nice processed image"""
 
     x, y, r = circle
-    red = cv2.imread("Resources/red.png")[100:350, 75:575]  # Needs same dim as cropped img
+    red = cv2.imread("Resources/red.png")[
+        100:350, 75:575
+    ]  # Needs same dim as cropped img
     a = cv2.bitwise_and(img, red, mask=epoxy_mask)
     epoxy_mask = 255 - epoxy_mask
     b = cv2.bitwise_and(img, img, mask=epoxy_mask)
@@ -42,8 +44,8 @@ def pick_radius(tube_input, radius=33):
     cv2.imshow("Tube with selected radius", tube_file)
     cv2.waitKey(0)
     response = input("Is the current radius good? (y/n)")
-    assert response == 'y' or response == 'n', "Must be y or n"
-    if response == 'y':
+    assert response == "y" or response == "n", "Must be y or n"
+    if response == "y":
         return radius
     else:
         inp = input("Input a different radius (int)")
@@ -63,15 +65,22 @@ for i in tqdm(range(total_slices)):
     tube_raw = cv2.imread(join(tube_path, tube_files[i]))
     img_raw = cv2.imread(join(base_path, files[i]))
 
-    img_cropped = img_raw[100:350, 75:575]  # When treating image as a matrix, height then width. The OpenCV convention
+    img_cropped = img_raw[
+        100:350, 75:575
+    ]  # When treating image as a matrix, height then width. The OpenCV convention
     # is width then height
     tube_cropped = tube_raw[100:350, 75:575]
 
     epox, circle = find_epoxy(img_cropped, tube_cropped, rad, i, precision)
-    cv2.imwrite(processed_path + "\\processed_" + files[i], person_output(img_cropped, epox, circle))
+    cv2.imwrite(
+        processed_path + "\\processed_" + files[i],
+        person_output(img_cropped, epox, circle),
+    )
 
 
 df = pd.DataFrame(tracker.get_stats())
 df.to_excel(join(folder, "Coverage data.xlsx"))
-tracker_analysis.save_coverage_stats(df.to_numpy(), save_folder=folder, col_count=precision)
+tracker_analysis.save_coverage_stats(
+    df.to_numpy(), save_folder=folder, col_count=precision
+)
 tracker_analysis.save_png_to_gif(processed_path, join(folder, "processed.gif"))

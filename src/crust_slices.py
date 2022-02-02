@@ -22,8 +22,12 @@ def get_crust_masks(img_dim, tube_circle, number_slices, thickness):
         Must be a positive integer. The thickness of the crusts to be returned.
     :return: List
     """
-    assert number_slices > 0 and isinstance(number_slices, int), "number_slices must be a positive integer"
-    assert thickness > 0 and isinstance(thickness, int), "thickness must be a positive integer"
+    assert number_slices > 0 and isinstance(
+        number_slices, int
+    ), "number_slices must be a positive integer"
+    assert thickness > 0 and isinstance(
+        thickness, int
+    ), "thickness must be a positive integer"
     cent_y, cent_x, radius = tube_circle
     angle_swept = 2 * math.pi / number_slices
 
@@ -33,7 +37,9 @@ def get_crust_masks(img_dim, tube_circle, number_slices, thickness):
     y_min = max(0, cent_y - int(1.25 * radius) - thickness)
     y_max = min(img_dim[1], cent_y + int(1.25 * radius) + thickness)
 
-    annulus = annulus_mask(img_dim, (cent_y, cent_x), radius, thickness)  # Awkward indexing courtesy of
+    annulus = annulus_mask(
+        img_dim, (cent_y, cent_x), radius, thickness
+    )  # Awkward indexing courtesy of
     # numpy/opencv indexing inconsistency
 
     slices = []
