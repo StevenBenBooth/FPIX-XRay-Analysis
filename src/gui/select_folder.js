@@ -1,11 +1,10 @@
 const resultField = document.querySelector("textarea");
 
-eel.expose(returnPath);
 function returnPath() {
-  return String(resultField.value);
-} (path_input)
+  eel.path_input(resultField.value);
+}
 
 eel.expose(loadNextPage);
 function loadNextPage() {
-  // load the next page
+  window.open("src/tube_diameter.html")
 }
