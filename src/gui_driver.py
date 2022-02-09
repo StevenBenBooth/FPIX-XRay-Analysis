@@ -19,5 +19,10 @@ def path_input(base_path):
         pass
 
 
+@eel.expose
+def update_img(radius):
+    write_tube_img(radius)
+
+
 # starting the application
 eel.start("select_folder.html")

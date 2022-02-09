@@ -38,7 +38,7 @@ def write_tube_img(radius=33):
     x, y = circ[:2]
     tube_file = tube_input.copy()
     cv2.circle(tube_file, (x, y), radius, (255, 0, 0), 1)
-    cv2.imwrite("src/gui/res/tube.png", tube_file)
+    cv2.imwrite("src/gui/res/tube_sample.png", tube_file)
     # cv2.imshow("Tube with selected radius", tube_file)
     # cv2.waitKey(0)
     # response = input("Is the current radius good? (y/n)")

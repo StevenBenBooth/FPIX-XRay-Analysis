@@ -70,6 +70,6 @@ def check_path(path):
 
 def make_processed():
     try:
-        os.mkdir(join(__base_path, " processed"))
+        os.mkdir(join(__base_path, "Processed"))
     except FileExistsError:
         pass
