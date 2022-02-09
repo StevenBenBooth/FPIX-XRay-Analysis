@@ -6,5 +6,5 @@ function returnPath() {
 
 eel.expose(loadNextPage);
 function loadNextPage() {
-  window.open("src/tube_diameter.html")
+  window.open("tube_diameter.html")
 }

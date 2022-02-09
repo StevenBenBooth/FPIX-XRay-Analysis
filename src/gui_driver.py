@@ -1,6 +1,7 @@
 import eel
-import paths
+import files
 from os.path import join
+from image_output import write_tube_img
 
 # initializing the application (points to the folder)
 eel.init("src/gui")
@@ -10,8 +11,9 @@ eel.init("src/gui")
 def path_input(base_path):
     path = "{}".format(base_path)
     try:
-        paths.set_paths(path)
-        paths.make_processed()
+        files.set_paths(path)
+        files.make_processed()
+        write_tube_img()
         eel.loadNextPage()
     except NotADirectoryError:
         pass
