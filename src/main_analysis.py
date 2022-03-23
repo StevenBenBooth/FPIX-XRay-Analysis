@@ -12,8 +12,10 @@ from stat_tracker import StatTracker
 from tube_analysis import get_bound_circ
 import tracker_analysis
 
-dataset = "D"
-folder = join("D:\\Documents\\Dragonfly data\\Junior fall", dataset)
+dataset = "Left"
+folder = join(
+    "D:\\Documents\\Dragonfly data\\Junior fall\\Diamond plaquette 1\\A", dataset
+)
 base_path = join(folder, dataset + " pictures")
 tube_path = join(folder, dataset + " tube")
 processed_path = join(folder, dataset + " processed")
