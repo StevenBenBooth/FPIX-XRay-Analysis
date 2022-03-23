@@ -3,7 +3,7 @@ from os.path import join
 import os
 import cv2
 
-"""This module acts a singleton to manage and load images"""
+"""This module acts a singleton to manage parsing through the images"""
 
 
 __base_path = None

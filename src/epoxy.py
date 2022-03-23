@@ -4,24 +4,10 @@ import numpy as np
 from fiber_processing import remove_fiber
 from tube_interpolate import process_highlights
 from tube_analysis import get_bound_circ
+import config
 
 
-def find_epoxy(
-    img,
-    img_tube,
-    tube_radius,
-    slice_num,
-    num_wedges,
-    highlight_cutoff=210,
-    epox_low_bound=40,
-    cf_top_bound=70,  # top_bound < bottom_bound because indexing starts from the top
-    # These bounds should be set to the y-position of somewhere in the carbon foam layers
-    cf_bottom_bound=173,
-    cf_thickness=7,
-    highlight_thickness=9,
-    interpolation_thresh=0.7,
-    epoxy_interp_thresh=0,
-):
+def find_epoxy(img, img_tube, slice_num):
     """Performs all the actions required to extract the epoxy from the image"""
 
     # These kernels don't need to be touched (most likely)
