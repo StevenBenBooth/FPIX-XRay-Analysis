@@ -89,17 +89,17 @@ from os.path import join
 import cv2
 
 base_path = "D:\\Documents\\Dragonfly data\\Junior fall\\Diamond plaquette 1"
-files_path = join(base_path, "A pictures")
-left_path = join(base_path, "A left")
-right_path = join(base_path, "A right")
+files_path = join(base_path, "A tubing")
+left_path = join(base_path, "A\\Left\\Left tube")
+right_path = join(base_path, "A\\Right\\Right tube")
 files = os.listdir(files_path)
 for i, file in enumerate(files):
     raw = cv2.imread(join(files_path, file))
     # cv2.imshow("img", raw)
     # cv2.waitKey(0)
     left = cv2.imwrite(
-        join(left_path, "slice " + str(i) + ".png"), raw[160:280, 100:265]
+        join(left_path, "tube " + str(i) + ".png"), raw[160:280, 100:265]
     )
     right = cv2.imwrite(
-        join(right_path, "slice " + str(i) + ".png"), raw[160:260, 370:510]
+        join(right_path, "tube " + str(i) + ".png"), raw[160:260, 370:510]
     )
