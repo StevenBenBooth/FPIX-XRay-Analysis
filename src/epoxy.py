@@ -9,8 +9,10 @@ from tube_analysis import get_bound_circ
 def find_epoxy(img, img_tube, tube_radius, slice_num, num_wedges):
     """Performs all the actions required to extract the epoxy from the image"""
 
-    # These kernels you probably don't need to touch
-    open_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    # These kernels you probably don't need to touch, unless your image size is dramatically different than earlier runs
+    # open_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    open_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+
     fiber_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     interpolate_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     blur_ker = (5, 5)
@@ -25,7 +27,7 @@ def find_epoxy(img, img_tube, tube_radius, slice_num, num_wedges):
     img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
 
     # Roughly identify the epoxy layer. 40, 220 is a good base
-    img_epoxy_raw = cv2.inRange(img_blur, 30, epox_hlght_cutoff)
+    img_epoxy_raw = cv2.inRange(img_blur, 25, epox_hlght_cutoff)
 
     # This function returns information on the tube center
     outer_tube = get_bound_circ(img_tube, tube_radius)
@@ -41,11 +43,11 @@ def find_epoxy(img, img_tube, tube_radius, slice_num, num_wedges):
     img_epoxy_ntube = cv2.bitwise_and(img_epoxy_raw, img_epoxy_raw, mask=not_tube_mask)
 
     # If you have some issue where carbon fiber is still interpreted as epoxy, you need to adjust these two numbers.
-    # Just open up a pic of the cropped tube in paint, and set the bounds to be the y-axis pixel pos for somewhere in
+    # Just open up a pic of the cropped slice in paint, and set the bounds to be the y-axis pixel pos for somewhere in
     # the two fiber regions. Because indexing starts from the top, the top_bound is a lower number than the bottom_bound
-    top_bound = 70
-    bottom_bound = 173
-    cf_thickness = 7  # This is the thickness of the carbon foam layers in pixels. It might vary a bit, but 6-8 works
+    top_bound = 49
+    bottom_bound = 82
+    cf_thickness = 4  # This is the thickness of the carbon foam layers in pixels. It might vary a bit, but 6-8 works
 
     # Removes the carbon fiber from the epoxy mask
     img_epoxy = remove_fiber(
@@ -70,8 +72,8 @@ def find_epoxy(img, img_tube, tube_radius, slice_num, num_wedges):
         outer_tube,
         slice_num,
         num_wedges,
-        9,
-        0.6,
+        5,
+        0.45,
         0,
         interpolate_close_ker,
     )

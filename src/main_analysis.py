@@ -61,19 +61,23 @@ precision = 50  # The number of radial slices for the analysis
 
 total_slices = len(files)
 tracker = StatTracker.get_instance(precision, total_slices)
-rad = pick_radius(cv2.imread(join(tube_path, tube_files[0]))[100:350, 75:575])
+rad = pick_radius(cv2.imread(join(tube_path, tube_files[0])))
 
 
-red = np.full((250, 500, 3), [0, 0, 255], dtype=np.uint8)
 for i in tqdm(range(total_slices)):
     tube_raw = cv2.imread(join(tube_path, tube_files[i]))
     img_raw = cv2.imread(join(base_path, files[i]))
 
-    img_cropped = img_raw[
-        100:350, 75:575
-    ]  # When treating image as a matrix, height then width. The OpenCV convention
-    # is width then height
-    tube_cropped = tube_raw[100:350, 75:575]
+    img_cropped = img_raw
+    tube_cropped = tube_raw
+
+    red = np.full(tube_cropped.shape, [0, 0, 255], dtype=np.uint8)
+
+    # img_cropped = img_raw[
+    #     100:350, 75:575
+    # ]  # When treating image as a matrix, height then width. The OpenCV convention
+    # # is width then height
+    # tube_cropped = tube_raw[100:350, 75:575]
 
     epox, circle = find_epoxy(img_cropped, tube_cropped, rad, i, precision)
     cv2.imwrite(

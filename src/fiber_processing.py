@@ -23,7 +23,7 @@ def remove_fiber(
     assert isinstance(thickness, int), "thickness must be an integer"
     rough_mask = 255 * np.ones(mask.shape[:2], np.uint8)  # Not sure if 255 is necessary
     shape = np.shape(mask)
-    rows, cols = shape
+    _, cols = shape
     cv2.rectangle(rough_mask, (0, top_upper_bound), (cols, bottom_lower_bound), 0, -1)
     fiber_parts = cv2.bitwise_and(mask, rough_mask)
     closed_fiber = cv2.morphologyEx(
