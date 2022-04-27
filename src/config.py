@@ -8,7 +8,7 @@ def tube_radius():
     return _tube_radius
 
 
-@property.setter
+@tube_radius.setter
 def tube_radius(value):
     global _tube_radius
     assert (
@@ -25,7 +25,7 @@ def num_wedges():
     return _num_wedges
 
 
-@property.setter
+@num_wedges.setter
 def num_wedges(value):
     global _num_wedges
     assert (
@@ -44,7 +44,7 @@ def epoxy_low_bound():
     return _epoxy_low_bound
 
 
-@property.setter
+@epoxy_low_bound.setter
 def epoxy_low_bound(value):
     global _epoxy_low_bound
     assert (
@@ -61,7 +61,7 @@ def highlight_low_bound():
     return _highlight_low_bound
 
 
-@property.setter
+@highlight_low_bound.setter
 def highlight_low_bound(value):
     global _highlight_low_bound
     assert (
@@ -84,7 +84,7 @@ def cf_top_bound():
     return _cf_top_bound
 
 
-@property.setter
+@cf_top_bound.setter
 def cf_top_bound(value):
     global _cf_top_bound
     assert (
@@ -101,7 +101,7 @@ def cf_bottom_bound():
     return _cf_bottom_bound
 
 
-@property.setter
+@cf_bottom_bound.setter
 def cf_top_bound(value):
     global _cf_bottom_bound
     assert (
@@ -109,7 +109,7 @@ def cf_top_bound(value):
     ), "The carbon foam top bound must be a nonnegative integer"
     assert (
         value > _cf_top_bound
-    ), "Counterintuitively, the cf bottom bound should should be higher than the cf top bound (numpy indexing)"
+    ), "Counterintuitively, the cf bottom bound should should be higher than the cf top bound (numpy indexing is the opposite of how the picture looks)"
     _cf_bottom_bound = value
 
 
@@ -121,7 +121,7 @@ def cf_thickness():
     return _cf_thickness
 
 
-@property.setter
+@cf_thickness.setter
 def cf_thickness(value):
     global _cf_thickness
     assert (
@@ -138,7 +138,7 @@ def highlight_thickness():
     return _highlight_thickness
 
 
-@property.setter
+@highlight_thickness.setter
 def highlight_thickness(value):
     global _highlight_thickness
     assert (
@@ -155,7 +155,7 @@ def interpolation_thresh():
     return _interpolation_thresh
 
 
-@property.setter
+@interpolation_thresh.setter
 def interpolation_thresh(value):
     global _interpolation_thresh
     assert (
@@ -172,7 +172,7 @@ def epoxy_interp_thresh():
     return _epoxy_interp_thresh
 
 
-@property.setter
+@epoxy_interp_thresh.setter
 def epoxy_interp_thresh(value):
     global _epoxy_interp_thresh
     assert (

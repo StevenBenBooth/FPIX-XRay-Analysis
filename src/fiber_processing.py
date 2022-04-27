@@ -2,15 +2,14 @@ import cv2
 import numpy as np
 
 
-def remove_fiber(
-    top_upper_bound, bottom_lower_bound, thickness, mask, close_ker, open_ker
-):
+def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     """
     Processes the image to ignore the carbon fiber in the image classification.
 
-    :param int top_upper_bound: The pixel position of the middle of the upper layer of carbon fiber (numpy conventions)
-    :param int bottom_lower_bound:
-        The pixel position of the middle of the lower layer of carbon fiber (numpy conventions)
+    :param int top_bound: The pixel position of the middle of the upper layer of carbon fiber (numpy conventions)
+    :param int bottom_bound:
+    The pixel position of the middle of the lower layer of carbon fiber (numpy conventions)
+
     :param int thickness: The thickness of the carbon fiber layer to be excluded from the mask
     :param arr mask: The mask to be processed
     :param arr close_ker: The kernel to close the fiber chunks together before finding bounds
@@ -18,19 +17,19 @@ def remove_fiber(
     :returns arr result: mask without carbon foam
     """
 
-    assert isinstance(top_upper_bound, int), "top_upper_bound must be an integer"
-    assert isinstance(bottom_lower_bound, int), "bottom_lower_bound must be an integer"
+    assert isinstance(top_bound, int), "top_upper_bound must be an integer"
+    assert isinstance(bottom_bound, int), "bottom_lower_bound must be an integer"
     assert isinstance(thickness, int), "thickness must be an integer"
     rough_mask = 255 * np.ones(mask.shape[:2], np.uint8)  # Not sure if 255 is necessary
     shape = np.shape(mask)
-    rows, cols = shape
-    cv2.rectangle(rough_mask, (0, top_upper_bound), (cols, bottom_lower_bound), 0, -1)
+    _, cols = shape
+    cv2.rectangle(rough_mask, (0, top_bound), (cols, bottom_bound), 0, -1)
     fiber_parts = cv2.bitwise_and(mask, rough_mask)
     closed_fiber = cv2.morphologyEx(
         fiber_parts, cv2.MORPH_CLOSE, close_ker, iterations=4
     )  # Closes up the fiber parts so the removal works better
     top_coords, bottom_coords = _find_coords(
-        top_upper_bound, bottom_lower_bound, closed_fiber, shape
+        top_bound, bottom_bound, closed_fiber, shape
     )
 
     for j in range(cols):

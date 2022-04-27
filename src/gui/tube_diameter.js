@@ -1,10 +1,18 @@
 const resultField = document.querySelector("textarea");
 
+
 function updateImage() {
   eel.update_tube_sample(resultField.value)
   // reloads page because browser cached image doesn't automatically update
   window.location.reload(true);
 }
+
+window.onload = getParameters;
+
+function getParameters() {
+
+}
+
 
 // function returnRadius() {
 //   eel.update_radius()

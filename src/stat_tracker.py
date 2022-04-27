@@ -6,7 +6,7 @@ class StatTracker:
     This is a Singleton tracker that records the tube coverage and slice area statistics. The initialization must supply
     radial_precision and slice_count.
 
-    Note that this could also be refactored to be a module-level Singleton.
+    It might be worth refactored this to be a module-level Singleton.
 
     ...
 
@@ -21,7 +21,7 @@ class StatTracker:
     -------
     get_instance()
         If __instance is None, instantiates a new StatTracker. Otherwise, returns the reference to the StatTracker.
-        radial_precision and slice_count must be supplied on first call, and must not on later references
+        radial_precision and slice_count must be supplied on first call, and not in subsequent calls
     initialize_matrix(rows, cols)
         Initializes stats to be a 2D array of False, with dimensions rows by cols
     update_value(row, col, value)
@@ -38,14 +38,14 @@ class StatTracker:
     def get_instance(radial_precision=None, slice_count=None):
         """Static access method."""
         if StatTracker.__instance is None:
-            assert radial_precision is not None and slice_count is not None, (
-                "On first reference, must pass in " "radial_precision and slice_count"
-            )
+            assert (
+                radial_precision is not None and slice_count is not None
+            ), "On first reference, must pass in radial_precision and slice_count"
             StatTracker(radial_precision, slice_count)
         else:
             assert (
                 radial_precision is None and slice_count is None
-            ), "After instantiation, you cannot change dimensions"
+            ), "Changing parameters is forbidden after initialization"
         return StatTracker.__instance
 
     def __initialize_coverage(self, rows, cols):
@@ -62,8 +62,9 @@ class StatTracker:
         self.area_stats[slice_index] = value
 
     def get_stats(self):
-        self.coverage_stats = np.where(self.coverage_stats, 1, 0)
-        return self.coverage_stats
+        """returns coverage and area stats. Coverage stats are returned as a 0/1 array rather than a boolean array"""
+        coverage_stats = np.where(self.coverage_stats, 1, 0)
+        return coverage_stats, self.area_stats
 
     def __init__(self, radial_num, slice_num):
         """Virtually private constructor."""

@@ -73,7 +73,6 @@
 //     window.location.reload(true);
 //   };
 // });
-const inputs = document.querySelectorAll("textarea")
 
 
 // inputs.forEach((item) => {
@@ -86,11 +85,14 @@ const inputs = document.querySelectorAll("textarea")
 // }
 // )
 
+const inputs = document.querySelectorAll("textarea")
+
+
 function updateSample() {
   var values = []
   values.length = inputs.length
-  inputs.forEach((item, index) => {
-    values[index] = item.value;
+  inputs.forEach((item, _) => {
+    values.push(item.value)
     // eel.log(item.value)
   })
   eel.updateSample(values);
