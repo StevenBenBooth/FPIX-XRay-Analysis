@@ -36,7 +36,7 @@ def set_paths(base_path):
         raise e
 
 
-def save_file(processed):
+def save_file():
     cv2.imwrite(join(__save_path, "slice {}".format(__current_slice)))
 
 
@@ -82,6 +82,10 @@ def load_images():
 
 def get_total():
     return __slice_total
+
+
+def get_current():
+    return __current_slice
 
 
 def check_path(path):

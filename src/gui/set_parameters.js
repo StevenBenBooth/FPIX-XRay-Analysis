@@ -88,16 +88,34 @@
 const inputs = document.querySelectorAll("textarea")
 
 
+function updateParams(values) {
+  inputs.forEach((item, index) => {
+    item.innerHTML = values[index]
+  }
+  )
+}
+
+function reload() {
+  eel.update_params(getValues())
+
+  window.location.reload(true);
+}
+
+window.onload = updateSample;
 function updateSample() {
+  eel.update_slice_sample();
+}
+
+function getValues() {
   var values = []
   values.length = inputs.length
   inputs.forEach((item, _) => {
     values.push(item.value)
     // eel.log(item.value)
   })
-  eel.updateSample(values);
-  window.location.reload(true);
+  return values
 }
+
 
 function beginProcessing() {
   //load progress page or just start the processing in the background

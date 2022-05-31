@@ -22,7 +22,7 @@ def get_bound_circ(tube_img, radius, method=Method.CONTOUR):
         future.
     :return:
     """
-    assert isinstance(radius, int), "radius must be an integer"
+    assert isinstance(int, radius), "radius must be an integer"
     if method is Method.CONTOUR:
         return _get_bound_circ_cont(tube_img, radius)
     if method is Method.HOUGH:
@@ -32,7 +32,7 @@ def get_bound_circ(tube_img, radius, method=Method.CONTOUR):
 def _get_bound_circ_cont(tube_img, radius):
     tube_gray = cv2.cvtColor(tube_img, cv2.COLOR_BGR2GRAY)
     thresh = cv2.inRange(tube_gray, 200, 255)
-    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     max_area = -1
     big_contour = contours[0]
@@ -69,6 +69,7 @@ def _get_bound_circ_Hough(tube_img, min_radius):
 
     max_radius = -1
     bounding_circle = (0, 0, 0)
+    # Selects biggest circle
     for circle in circles:
         r = circle[2]
         if r >= max_radius:

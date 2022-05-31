@@ -1,4 +1,5 @@
 import numpy as np
+import files
 
 
 class StatTracker:
@@ -55,8 +56,8 @@ class StatTracker:
     def __initialize_area(self, slices):
         self.area_stats = np.zeros((slices,), dtype=np.uint8)
 
-    def update_coverage(self, row, col, value: bool):
-        self.coverage_stats[row][col] = value
+    def update_coverage(self, slice, value: bool):
+        self.coverage_stats[files.get_current()][slice] = value
 
     def update_area(self, slice_index, value):
         self.area_stats[slice_index] = value

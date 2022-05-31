@@ -9,7 +9,8 @@ class _Config:
         self._tube_radius = 33
         self._num_wedges = 50
         self._epoxy_low_bound = 40
-        # highlight low bound is both the lower intensity bound for pixels to be interpreted as a highlight and the upper bound for them to be interpreted as epoxy
+        # highlight low bound is both the lower intensity bound for pixels to be
+        # interpreted as a highlight and the upper bound for them to be interpreted as epoxy
         self._highlight_low_bound = 210
         self._cf_top_bound = (
             70  # top_bound < bottom_bound because indexing starts from the top
@@ -17,10 +18,22 @@ class _Config:
         # These bounds should be set to the y-position of somewhere in the carbon foam layers
         self._cf_bottom_bound = 173
         self._cf_thickness = 7
-        self._epoxy_interp_thresh = 0
         self._highlight_thickness = 9
         self._interpolation_thresh = 0.7
+        self._epoxy_interp_thresh = 0
 
+    def update_values(self, values):
+        self._num_wedges,
+        self._epoxy_low_bound,
+        self._highlight_low_bound,
+        self._cf_top_bound,
+        self._cf_bottom_bound,
+        self._cf_thickness,
+        self._highlight_thickness,
+        self._interpolation_thresh,
+        self._epoxy_interp_thresh = values
+
+    # TODO: Refactor to only use __setattr__ in order to avoid bloat from getters
     @property
     def tube_radius(self):
         return self._tube_radius

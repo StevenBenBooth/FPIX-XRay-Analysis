@@ -8,7 +8,7 @@ from tube_analysis import get_bound_circ
 import config
 
 
-def find_epoxy(img, img_tube, slice_num):
+def find_epoxy(img, img_tube, save_information=True):
     """Performs all the actions required to extract the epoxy from the image"""
 
     # These kernels don't need to be touched (most likely)
@@ -59,10 +59,10 @@ def find_epoxy(img, img_tube, slice_num):
     )
 
     img_interpolated = process_highlights(
+        save_information,
         img_epoxy,
         img_highlights,
         outer_tube,
-        slice_num,
         config.num_wedges,
         config.highlight_thickness,
         config.interpolation_thresh,
