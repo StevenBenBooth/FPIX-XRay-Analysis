@@ -6,5 +6,6 @@ function returnPath() {
 
 eel.expose(loadNextPage);
 function loadNextPage() {
-  window.open("tube_diameter.html", "_self", "width=400, height=400")
+  eel.update_tube_sample();
+  window.open("tube_diameter.html", "_self", "width=400, height=400");
 }

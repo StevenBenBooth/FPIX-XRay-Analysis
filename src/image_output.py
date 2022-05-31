@@ -42,7 +42,7 @@ def write_image_sample():
     )
 
 
-def write_image(params):
+def write_image():
     img, tube = files.get_next()
     processed_mask, tube_info = find_epoxy(img, tube)
     files.save_file(person_output(img, red, processed_mask, tube_info))

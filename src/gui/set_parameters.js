@@ -87,33 +87,32 @@
 
 const inputs = document.querySelectorAll("textarea")
 
-
-function updateParams(values) {
-  inputs.forEach((item, index) => {
-    item.innerHTML = values[index]
-  }
-  )
-}
-
 function reload() {
-  eel.update_params(getValues())
-
+  eel.update_params(getFields());
+  eel.update_slice_sample();
   window.location.reload(true);
 }
 
 window.onload = updateSample;
 function updateSample() {
-  eel.update_slice_sample();
+  updateFields(eel.get_parameters());
 }
 
-function getValues() {
-  var values = []
-  values.length = inputs.length
+
+function updateFields(val) {
+  inputs.forEach((item, index) => {
+    item.innerHTML = val[index] // will the passed val be an array?
+  }
+  )
+}
+function getFields() {
+  var val = []
+  val.length = inputs.length
   inputs.forEach((item, _) => {
-    values.push(item.value)
-    // eel.log(item.value)
+    val.push(item.value)
+    eel.log(item.value)
   })
-  return values
+  return val
 }
 
 

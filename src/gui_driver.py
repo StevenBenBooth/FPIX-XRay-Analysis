@@ -46,6 +46,11 @@ def update_slice_sample():
 
 
 @eel.expose
+def get_parameters():
+    return config.get_params
+
+
+@eel.expose
 def log(val):
     print(val)
 

@@ -22,7 +22,7 @@ class _Config:
         self._interpolation_thresh = 0.7
         self._epoxy_interp_thresh = 0
 
-    def update_values(self, values):
+    def update_params(self, values):
         self._num_wedges,
         self._epoxy_low_bound,
         self._highlight_low_bound,
@@ -32,6 +32,19 @@ class _Config:
         self._highlight_thickness,
         self._interpolation_thresh,
         self._epoxy_interp_thresh = values
+
+    def get_params(self):  # TODO: something about this
+        return [
+            self._num_wedges,
+            self._epoxy_low_bound,
+            self._highlight_low_bound,
+            self._cf_top_bound,
+            self._cf_bottom_bound,
+            self._cf_thickness,
+            self._highlight_thickness,
+            self._interpolation_thresh,
+            self._epoxy_interp_thresh,
+        ]
 
     # TODO: Refactor to only use __setattr__ in order to avoid bloat from getters
     @property
@@ -43,7 +56,7 @@ class _Config:
         try:
             radius = int(value)
         except ValueError:
-            raise ValueError("Value must be an integer or coercible to an integer")
+            raise ValueError("Radius must be an integer or coercible to an integer")
         assert radius > 0, "Tube radius must be positive"
         self._tube_radius = radius
 
@@ -53,10 +66,14 @@ class _Config:
 
     @num_wedges.setter
     def num_wedges(self, value):
-        assert (
-            isinstance(value, int) and value > 0
-        ), "The number of interpolation slices must be a positive integer"
-        self._num_wedges = value
+        try:
+            num = int(value)
+        except ValueError:
+            raise ValueError(
+                "The number of wedges must be an integer or coercible to an integer"
+            )
+        assert num > 0, "The number of interpolation slices must be positive"
+        self._num_wedges = num
 
     @property
     def epoxy_low_bound(self):

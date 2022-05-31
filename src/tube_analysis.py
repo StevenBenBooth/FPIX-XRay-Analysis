@@ -22,7 +22,7 @@ def get_bound_circ(tube_img, radius, method=Method.CONTOUR):
         future.
     :return:
     """
-    assert isinstance(int, radius), "radius must be an integer"
+    assert isinstance(radius, int), "radius must be an integer"
     if method is Method.CONTOUR:
         return _get_bound_circ_cont(tube_img, radius)
     if method is Method.HOUGH:
