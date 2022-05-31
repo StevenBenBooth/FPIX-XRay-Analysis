@@ -1,5 +1,6 @@
 import eel
 import files
+import config
 from image_output import write_tube_img, write_image_sample
 
 # initializing the application (points to the folder containing the web components)
@@ -28,6 +29,12 @@ def update_tube_sample(radius):
 
 
 @eel.expose
+def get_radius():
+    print(config.tube_radius)
+    return config.tube_radius
+
+
+@eel.expose
 def update_slice_sample(params):
     print(params)
     write_image_sample(*tuple(params))
@@ -39,4 +46,6 @@ def log(val):
 
 
 # starting the application
-eel.start("select_folder.html")
+eel.start(
+    "select_folder.html", mode="chrome"
+)  # chrome looks nicer, but edge works on all windows machines
