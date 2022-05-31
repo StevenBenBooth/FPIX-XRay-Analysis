@@ -6,8 +6,6 @@ from image_output import write_tube_img, write_image_sample
 # initializing the application (points to the folder containing the web components)
 eel.init("src/gui")
 
-__tube_radius = None
-
 
 @eel.expose
 def path_input(base_path):
@@ -23,20 +21,17 @@ def path_input(base_path):
 
 @eel.expose
 def update_tube_sample(radius):
-    global __tube_radius
-    __tube_radius = int(radius)
-    write_tube_img(__tube_radius)
+    config.tube_radius = radius
+    write_tube_img(config.tube_radius)
 
 
 @eel.expose
 def get_radius():
-    print(config.tube_radius)
     return config.tube_radius
 
 
 @eel.expose
 def update_slice_sample(params):
-    print(params)
     write_image_sample(*tuple(params))
 
 

@@ -8,11 +8,7 @@ function updateImage() {
 
 window.onload = updateRadius;
 function updateRadius() {
-  eel.get_radius()(changeField);
-}
-
-function changeField(x) {
-  resultField.innerHTML = x;
+  eel.get_radius()(x => resultField.innerHTML = x);
 }
 
 function loadNextPage() {
