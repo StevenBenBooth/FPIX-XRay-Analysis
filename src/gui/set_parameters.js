@@ -95,22 +95,21 @@ function reload() {
 
 window.onload = updateSample;
 function updateSample() {
-  updateFields(eel.get_parameters());
+  eel.get_parameters()(updateFields); // Use a callback, since eel returns a promise 
 }
 
 
 function updateFields(val) {
   inputs.forEach((item, index) => {
-    item.innerHTML = val[index] // will the passed val be an array?
+    item.innerHTML = val[index]
   }
   )
 }
+
 function getFields() {
   var val = []
-  val.length = inputs.length
   inputs.forEach((item, _) => {
     val.push(item.value)
-    eel.log(item.value)
   })
   return val
 }

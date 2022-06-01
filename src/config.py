@@ -1,4 +1,5 @@
 """This module stores the global settings inputted from the gui, to be used for processing"""
+from multiprocessing.sharedctypes import Value
 import sys
 
 from numpy import isin
@@ -22,29 +23,45 @@ class _Config:
         self._interpolation_thresh = 0.7
         self._epoxy_interp_thresh = 0
 
-    def update_params(self, values):
-        self._num_wedges,
-        self._epoxy_low_bound,
-        self._highlight_low_bound,
-        self._cf_top_bound,
-        self._cf_bottom_bound,
-        self._cf_thickness,
-        self._highlight_thickness,
-        self._interpolation_thresh,
-        self._epoxy_interp_thresh = values
+    def update_params(self, *values):
+        (
+            self.num_wedges,
+            self.epoxy_low_bound,
+            self.highlight_low_bound,
+            self.cf_top_bound,
+            self.cf_bottom_bound,
+            self.cf_thickness,
+            self.highlight_thickness,
+            self.interpolation_thresh,
+            self.epoxy_interp_thresh,
+        ) = values
 
-    def get_params(self):  # TODO: something about this
+    def get_params(self):  # TODO: make this stuff prettier if possible
         return [
-            self._num_wedges,
-            self._epoxy_low_bound,
-            self._highlight_low_bound,
-            self._cf_top_bound,
-            self._cf_bottom_bound,
-            self._cf_thickness,
-            self._highlight_thickness,
-            self._interpolation_thresh,
-            self._epoxy_interp_thresh,
+            self.num_wedges,
+            self.epoxy_low_bound,
+            self.highlight_low_bound,
+            self.cf_top_bound,
+            self.cf_bottom_bound,
+            self.cf_thickness,
+            self.highlight_thickness,
+            self.interpolation_thresh,
+            self.epoxy_interp_thresh,
         ]
+
+    def intcast(self, val, name):
+        assert isinstance(name, str), "The variable name should be a string"
+        try:
+            return int(val)
+        except ValueError:
+            raise ValueError(name, " must be an integer or coercible to an integer")
+
+    def floatcast(self, val, name):
+        assert isinstance(name, str), "The variable name should be a string"
+        try:
+            return float(val)
+        except ValueError:
+            raise ValueError(name, " must be an float or coercible to a float")
 
     # TODO: Refactor to only use __setattr__ in order to avoid bloat from getters
     @property
@@ -52,11 +69,8 @@ class _Config:
         return self._tube_radius
 
     @tube_radius.setter
-    def tube_radius(self, value):
-        try:
-            radius = int(value)
-        except ValueError:
-            raise ValueError("Radius must be an integer or coercible to an integer")
+    def tube_radius(self, val):
+        radius = self.intcast(val, "Radius")
         assert radius > 0, "Tube radius must be positive"
         self._tube_radius = radius
 
@@ -65,13 +79,8 @@ class _Config:
         return self._num_wedges
 
     @num_wedges.setter
-    def num_wedges(self, value):
-        try:
-            num = int(value)
-        except ValueError:
-            raise ValueError(
-                "The number of wedges must be an integer or coercible to an integer"
-            )
+    def num_wedges(self, val):
+        num = self.intcast(val, "Wedge count")
         assert num > 0, "The number of interpolation slices must be positive"
         self._num_wedges = num
 
@@ -80,101 +89,99 @@ class _Config:
         return self._epoxy_low_bound
 
     @epoxy_low_bound.setter
-    def epoxy_low_bound(self, value):
+    def epoxy_low_bound(self, val):
+        low_bound = self.intcast(val, "Epoxy low bound")
         assert (
-            isinstance(value, int) and value >= 0 and value <= 255
+            low_bound >= 0 and low_bound <= 255
         ), "The low cutoff for epoxy must be an integer in 0, ..., 255"
-        assert (
-            value < self._highlight_low_bound
-        ), "The low cutoff for epoxy must be below the low cutoff for highlights"
-        self._epoxy_low_bound = value
+        self._epoxy_low_bound = low_bound
 
     @property
     def highlight_low_bound(self):
         return self._highlight_low_bound
 
     @highlight_low_bound.setter
-    def highlight_low_bound(self, value):
+    def highlight_low_bound(self, val):
+        low_bound = self.intcast(val, "Highlight low cutoff")
         assert (
-            isinstance(value, int) and value >= 0 and value <= 255
-        ), "The cutoff intensity for highlights must be an integer in 0, ..., 255"
+            low_bound >= 0 and low_bound <= 255
+        ), "The cutoff intensity for highlights must be in 0, ..., 255"
         assert (
-            value > self._highlight_low_bound
-        ), "The low cutoff for epoxy must be below the low cutoff for highlights"
-
-        self._highlight_low_bound = value
+            low_bound > self.epoxy_low_bound
+        ), "The low cutoff for highlights must be greater than the low cutoff for epoxy"
+        self._highlight_low_bound = low_bound
 
     @property
     def cf_top_bound(self):
         return self._cf_top_bound
 
     @cf_top_bound.setter
-    def cf_top_bound(self, value):
-        assert (
-            isinstance(value, int) and value >= 0
-        ), "The carbon foam top bound must be a nonnegative integer"
-        assert (
-            value < self._cf_bottom_bound
-        ), "Counterintuitively, the cf top bound should should be lower than the cf bottom bound (numpy indexing)"
-        self._cf_top_bound = value
+    def cf_top_bound(self, val):
+        top_bound = self.intcast(val, "Carbon Foam top bound")
+
+        assert top_bound >= 0, "The carbon foam top bound must be a nonnegative integer"
+        self._cf_top_bound = top_bound
 
     @property
     def cf_bottom_bound(self):
         return self._cf_bottom_bound
 
     @cf_bottom_bound.setter
-    def cf_top_bound(self, value):
+    def cf_bottom_bound(self, val):
+        bottom_bound = self.intcast(val, "Carbon Foam bottom bound")
+
         assert (
-            isinstance(value, int) and value >= 0
-        ), "The carbon foam top bound must be a nonnegative integer"
+            bottom_bound >= 0
+        ), "The carbon foam bottom bound must be a nonnegative integer"
         assert (
-            value > self._cf_top_bound
+            bottom_bound > self._cf_top_bound
         ), "Counterintuitively, the cf bottom bound should should be higher than the cf top bound (numpy indexing is the opposite of how the picture looks)"
-        self._cf_bottom_bound = value
+        self._cf_bottom_bound = bottom_bound
 
     @property
     def cf_thickness(self):
         return self._cf_thickness
 
     @cf_thickness.setter
-    def cf_thickness(self, value):
-        assert (
-            isinstance(value, int) and value >= 0
-        ), "carbon foam thickness should be a nonnegative integer"
-        self._cf_thickness = value
+    def cf_thickness(self, val):
+        thickness = self.intcast(val, "Carbon Foam thickness")
+        assert thickness >= 0, "Carbon foam thickness should be nonnegative"
+        self._cf_thickness = thickness
 
     @property
     def highlight_thickness(self):
         return self._highlight_thickness
 
     @highlight_thickness.setter
-    def highlight_thickness(self, value):
-        assert (
-            isinstance(value, int) and value >= 0
-        ), "highlight thickness should be a nonnegative integer"
-        self._highlight_thickness = value
+    def highlight_thickness(self, val):
+        thickness = self.intcast(val, "Highlight thickness")
+
+        assert thickness >= 0, "Highlight thickness should be nonnegative"
+        self._highlight_thickness = thickness
 
     @property
     def interpolation_thresh(self):
         return self._interpolation_thresh
 
     @interpolation_thresh.setter
-    def interpolation_thresh(self, value):
+    def interpolation_thresh(self, val):
+        thresh = self.floatcast(val, "Interpolation threshold")
         assert (
-            value >= 0 and value <= 1
+            thresh >= 0 and thresh <= 1
         ), "The interpolation threshold is a proportion, so must be in the interval [0, 1]"
-        self._interpolation_thresh = value
+        self._interpolation_thresh = thresh
 
     @property
     def epoxy_interp_thresh(self):
         return self._epoxy_interp_thresh
 
     @epoxy_interp_thresh.setter
-    def epoxy_interp_thresh(self, value):
+    def epoxy_interp_thresh(self, val):
+        thresh = self.floatcast(val, "Epoxy threshold")
         assert (
-            value >= 0 and value <= 1
+            thresh >= 0 and thresh <= 1
         ), "The epoxy interpolation threshold is a proportion, so must be in the interval [0, 1]"
-        self._epoxy_interp_thresh = value
+        self._epoxy_interp_thresh = thresh
 
 
 # Properties must exist as attributes of a class, rather than of an instance.
