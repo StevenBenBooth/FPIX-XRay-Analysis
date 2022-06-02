@@ -3,7 +3,7 @@ import pandas as pd
 
 import config
 from os.path import join
-from files import slices
+import files
 from epoxy import find_epoxy
 from image_output import person_output
 from stat_tracker import StatTracker
@@ -15,9 +15,11 @@ def process():
     tracker = StatTracker.get_instance()
     folder = config.save_path
 
-    for foam_slice, tube_slice in slices:
+    for i, (foam_slice, tube_slice) in enumerate(files.slices):
         epox, circle = find_epoxy(foam_slice, tube_slice)
-        slices.save_img(person_output(foam_slice, epox, circle))
+        files.slices.save_img(person_output(foam_slice, epox, circle))
+        if i % 1 == 0:
+            eel.update(files.slices.get_progress())
 
     df = pd.DataFrame(tracker.get_stats())
     df.to_excel(join(folder, "Coverage data.xlsx"))

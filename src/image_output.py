@@ -25,7 +25,7 @@ def person_output(img, epoxy_mask, circle):
 
 def write_tube_sample(radius):
     """Saves the image of the tube with selected radius"""
-    tube_input = files.get_tube_sample()
+    tube_input = files.slices.get_tube_sample()
     circ = get_bound_circ(tube_input, radius)
     x, y = circ[:2]
     tube_file = tube_input.copy()
@@ -34,7 +34,7 @@ def write_tube_sample(radius):
 
 
 def write_image_sample():
-    img, tube = files.get_image_sample()
+    img, tube = files.slices.get_image_sample()
     processed_mask, tube_info = find_epoxy(img, tube, save_information=False)
     cv2.imwrite(
         "src/gui/res/settings_sample.png",

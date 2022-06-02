@@ -1,8 +1,8 @@
-from email.mime import base
 import eel
 from files import setup
 import config
 from image_output import write_tube_sample, write_image_sample
+from process import process
 
 # initializing the application (points to the folder containing the web components)
 eel.init("src/gui")
@@ -11,10 +11,7 @@ eel.init("src/gui")
 @eel.expose
 def set_path(base_path):
     setup(base_path)
-
-
-# path_input(r"C:\Users\Work\Desktop\test data")
-# config.tube_radius = 32
+    eel.loadNextPage()
 
 
 @eel.expose
@@ -48,6 +45,11 @@ def get_radius():
 @eel.expose
 def update_slice_sample():
     write_image_sample()
+
+
+@eel.expose
+def start_processing():
+    process()
 
 
 @eel.expose

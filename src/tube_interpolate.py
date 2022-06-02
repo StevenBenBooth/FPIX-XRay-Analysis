@@ -1,4 +1,3 @@
-from operator import is_
 import cv2
 from crust_slices import get_crust_masks
 from stat_tracker import StatTracker

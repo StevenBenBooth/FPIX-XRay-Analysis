@@ -11,7 +11,7 @@ slices = None
 def setup(path):
     config.set_paths(path)
     global slices
-    if slices is not None:
+    if slices is None:
         slices = _Files(path)
     else:
         raise ValueError("The images should only be set up once")
@@ -30,9 +30,9 @@ class _Files:
         self.current_slice = 0
         self.slice_imgs = os.listdir(config.slice_path)
         self.tube_imgs = os.listdir(config.tube_path)
-        self.slice_total = len(self.slice_images)
+        self.slice_total = len(self.slice_imgs)
         assert self.slice_total == len(
-            config.tube_imgs
+            self.tube_imgs
         ), "There must be the same number of tube images as slice images"
 
     def __iter__(self):
@@ -40,7 +40,7 @@ class _Files:
 
     def __next__(self):
         """returns next (slice image, tube image) to be processed, each cropped"""
-        if self.current_slice >= len(self.slice_imgs):
+        if self.current_slice >= self.slice_total:
             raise StopIteration
         res = (
             load_and_crop(config.slice_path, self.slice_imgs[self.current_slice]),
@@ -50,7 +50,9 @@ class _Files:
         return res
 
     def save_img(self, img):
-        cv2.imwrite(join(config.save_path, "slice {}".format(self.current_slice)), img)
+        cv2.imwrite(
+            join(config.save_path, "slice {}.png".format(self.current_slice)), img
+        )
 
     def get_tube_sample(self):
         return load_and_crop(config.tube_path, self.tube_imgs[0])

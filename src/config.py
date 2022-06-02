@@ -35,7 +35,9 @@ class _Config:
 
     def set_paths(self, base_path):
         try:
-            self.base_path = self.check_path(base_path)
+            self.base_path = self.check_path(
+                base_path
+            )  # Obvious candidate for a setattr refactor, same as the next two
             self.slice_path = self.check_path(join(base_path, "Pictures"))
             self.tube_path = self.check_path(join(base_path, "Tube"))
             self.save_path = join(self.base_path, "Processed")

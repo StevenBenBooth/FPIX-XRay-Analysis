@@ -116,5 +116,6 @@ function getFields() {
 
 
 function beginProcessing() {
-  //load progress page or just start the processing in the background
+  eel.start_processing();
+  window.open("progress.html", "_self");
 }
