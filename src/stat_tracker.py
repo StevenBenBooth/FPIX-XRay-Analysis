@@ -7,7 +7,7 @@ class StatTracker:
     This is a Singleton tracker that records the tube coverage and slice area statistics. The initialization must supply
     radial_precision and slice_count.
 
-    It might be worth refactored this to be a module-level Singleton.
+    It might be worth refactored this to be a module.
 
     ...
 

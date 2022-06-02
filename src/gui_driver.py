@@ -1,5 +1,6 @@
+from email.mime import base
 import eel
-import files
+from files import setup
 import config
 from image_output import write_tube_sample, write_image_sample
 
@@ -8,18 +9,12 @@ eel.init("src/gui")
 
 
 @eel.expose
-def path_input(base_path):
-    path = "{}".format(base_path)
-    try:
-        files.set_paths(path)
-        files.make_processed()
-        eel.loadNextPage()
-    except NotADirectoryError:
-        pass
+def set_path(base_path):
+    setup(base_path)
 
 
-path_input(r"C:\Users\Work\Desktop\test data")
-config.tube_radius = 32
+# path_input(r"C:\Users\Work\Desktop\test data")
+# config.tube_radius = 32
 
 
 @eel.expose
@@ -61,8 +56,6 @@ def log(val):
 
 
 # starting the application
-# eel.start(
-#     "select_folder.html", mode="chrome"
-# )  # chrome looks nicer, but edge would work on machines without chrome installed
-
-eel.start("set_parameters.html", mode="chrome")
+eel.start(
+    "select_folder.html", mode="chrome"
+)  # chrome looks nicer, but edge would work on machines without chrome installed

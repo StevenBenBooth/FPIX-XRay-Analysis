@@ -1,105 +1,68 @@
-from tkinter import messagebox
 from os.path import join
 import os
 import cv2
+import config
 
-"""This module acts a singleton to manage parsing through the images"""
+"""This module contains an iterable for the slices of the scan"""
 
-
-__base_path = None
-__slice_path = None
-__tube_path = None
-__save_path = None
+slices = None
 
 
-__slice_imgs = None
-__tube_imgs = None
-
-__slice_total = None
-__current_slice = None
-
-
-def set_paths(base_path):
-    try:
-        global __base_path
-        global __slice_path
-        global __tube_path
-        global __current_slice
-
-        __current_slice = 0
-
-        __base_path = check_path(base_path)
-        __slice_path = check_path(join(base_path, "Pictures"))
-        __tube_path = check_path(join(base_path, "Tube"))
-        load_images()
-    except NotADirectoryError as e:
-        raise e
+def setup(path):
+    config.set_paths(path)
+    global slices
+    if slices is not None:
+        slices = _Files(path)
+    else:
+        raise ValueError("The images should only be set up once")
 
 
-def save_file():
-    cv2.imwrite(join(__save_path, "slice {}".format(__current_slice)))
-
-
-def _load_and_crop(path, slice):
+def load_and_crop(path, slice):
     return cv2.imread(join(path, slice))[
         100:350, 75:575
     ]  # When treating image as a matrix, height then width. The OpenCV convention
     # is width then height
 
 
-def get_tube_sample():
-    return _load_and_crop(__tube_path, __tube_imgs[0])
+class _Files:
+    def __init__(self, path):
+        config.set_paths(path)
+        self.current_slice = 0
+        self.slice_imgs = os.listdir(config.slice_path)
+        self.tube_imgs = os.listdir(config.tube_path)
+        self.slice_total = len(self.slice_images)
+        assert self.slice_total == len(
+            config.tube_imgs
+        ), "There must be the same number of tube images as slice images"
 
+    def __iter__(self):
+        return self
 
-def get_image_sample():
-    center_slice = int(__slice_total / 2)
-    return (
-        _load_and_crop(__slice_path, __slice_imgs[center_slice]),
-        _load_and_crop(__tube_path, __tube_imgs[center_slice]),
-    )
+    def __next__(self):
+        """returns next (slice image, tube image) to be processed, each cropped"""
+        if self.current_slice >= len(self.slice_imgs):
+            raise StopIteration
+        res = (
+            load_and_crop(config.slice_path, self.slice_imgs[self.current_slice]),
+            load_and_crop(config.tube_path, self.tube_imgs[self.current_slice]),
+        )
+        self.current_slice += 1
+        return res
 
+    def save_img(self, img):
+        cv2.imwrite(join(config.save_path, "slice {}".format(self.current_slice)), img)
 
-def get_next():
-    """returns (slice image, tube image), each cropped"""
-    global __current_slice
-    res = (
-        _load_and_crop(__slice_path, __slice_imgs[__current_slice]),
-        _load_and_crop(__tube_path, __tube_imgs[__current_slice]),
-    )
-    __current_slice += 1
-    return res
+    def get_tube_sample(self):
+        return load_and_crop(config.tube_path, self.tube_imgs[0])
 
+    def get_image_sample(self):
+        center_slice = int(
+            self.slice_total / 2
+        )  # The middle slices are more indicitave of the sample scan than the ends
+        return (
+            load_and_crop(config.slice_path, self.slice_imgs[center_slice]),
+            load_and_crop(config.tube_path, self.tube_imgs[center_slice]),
+        )
 
-def load_images():
-    global __slice_imgs
-    global __tube_imgs
-    global __slice_total
-
-    __slice_imgs = os.listdir(__slice_path)
-    __tube_imgs = os.listdir(__tube_path)
-    __slice_total = len(__slice_imgs)
-
-
-def get_total():
-    return __slice_total
-
-
-def get_current():
-    return __current_slice
-
-
-def check_path(path):
-    if not os.path.isdir(path):
-        message = "{} does not define a valid folder path".format(path)
-        messagebox.showerror("Not a path", message)
-        raise NotADirectoryError(message)
-    return path
-
-
-def make_processed():
-    global __save_path
-    __save_path = join(__base_path, "Processed")
-    try:
-        os.mkdir(__save_path)
-    except FileExistsError:
-        pass
+    def get_progress(self):
+        return "{}/{} images processed".format(self.current_slice, self.slice_total)

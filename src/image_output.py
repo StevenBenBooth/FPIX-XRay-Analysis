@@ -8,14 +8,14 @@ from epoxy import find_epoxy
 from tube_analysis import get_bound_circ
 
 # defines a red image used to make a nice output later on
-red = np.full((250, 500, 3), [0, 0, 255], dtype=np.uint8)
 
 
-def person_output(img, color, epoxy_mask, circle):
+def person_output(img, epoxy_mask, circle):
     """Takes in the raw image, base color, epoxy mask, and circle to make a nice processed image"""
+    red = np.full((250, 500, 3), [0, 0, 255], dtype=np.uint8)
 
     x, y, r = circle
-    a = cv2.bitwise_and(img, color, mask=epoxy_mask)
+    a = cv2.bitwise_and(img, red, mask=epoxy_mask)
     epoxy_mask = 255 - epoxy_mask
     b = cv2.bitwise_and(img, img, mask=epoxy_mask)
     pretty = cv2.bitwise_or(a, b)
@@ -38,11 +38,5 @@ def write_image_sample():
     processed_mask, tube_info = find_epoxy(img, tube, save_information=False)
     cv2.imwrite(
         "src/gui/res/settings_sample.png",
-        person_output(img, red, processed_mask, tube_info),
+        person_output(img, processed_mask, tube_info),
     )
-
-
-def write_image():
-    img, tube = files.get_next()
-    processed_mask, tube_info = find_epoxy(img, tube)
-    files.save_file(person_output(img, red, processed_mask, tube_info))

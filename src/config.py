@@ -1,8 +1,8 @@
-"""This module stores the global settings inputted from the gui, to be used for processing"""
-from multiprocessing.sharedctypes import Value
+"""This module stores the global state, both gui settings and save paths"""
 import sys
-
-from numpy import isin
+import os
+from os.path import join
+from tkinter import messagebox
 
 
 class _Config:
@@ -22,6 +22,28 @@ class _Config:
         self._highlight_thickness = 9
         self._interpolation_thresh = 0.7
         self._epoxy_interp_thresh = 0
+        self.slice_path = None
+        self.tube_path = None
+        self.save_path = None
+
+    def check_path(self, path):
+        if not os.path.isdir(path):
+            message = "{} does not define a valid folder path".format(path)
+            messagebox.showerror("Not a path", message)
+            raise NotADirectoryError(message)
+        return path
+
+    def set_paths(self, base_path):
+        try:
+            self.base_path = self.check_path(base_path)
+            self.slice_path = self.check_path(join(base_path, "Pictures"))
+            self.tube_path = self.check_path(join(base_path, "Tube"))
+            self.save_path = join(self.base_path, "Processed")
+            os.mkdir(self.save_path)
+        except FileExistsError:
+            pass
+        except NotADirectoryError as e:
+            raise e
 
     def update_params(self, *values):
         (

@@ -1,7 +1,7 @@
 const resultField = document.querySelector("textarea");
 
 function returnPath() {
-  eel.path_input(resultField.value);
+  eel.set_path(resultField.value);
 }
 
 eel.expose(loadNextPage);
