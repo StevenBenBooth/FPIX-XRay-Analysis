@@ -1,21 +1,24 @@
 <html>
 
 <script type="text/javascript" src="/eel.js"></script>
+<link rel="stylesheet" href="select_folder.css">
 
 <head>
     <title>
         Select Folder
     </title>
+    <link rel="shortcut icon" type="image/x-icon" href="res/icon.png">
+
 </head>
 
 <body>
     <label>Input the folder path in which the tube and unprocessed images are</label>
     <br>
     <label>Base folder path:</label>
-    <textarea></textarea>
-    <!-- Has to be below the other stuff or else the button doesn't exist -->
+    <textarea>C:\Users\Work\Desktop\test data</textarea>
+    <!-- This one has to be in the body -->
     <script type="text/javascript" src="select_folder.js"></script>
-    <button type="button" onclick="returnPath()">
+    <button class="continue" type="button" onclick="returnPath()">
         Continue
     </button>
 </body>

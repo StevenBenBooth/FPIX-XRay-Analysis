@@ -4,11 +4,20 @@
 
 <head>
   <title>Tube selection</title>
+  <link rel="shortcut icon" type="image/x-icon" href="res/icon.png">
 </head>
 
-
 <body>
-  <label>Here be the tube selector</label>
+  <label>Input radius:</label>
+  <textarea></textarea>
+  <button onclick="reload()">Update radius</button>
+  <br>
+  <script type="text/javascript" src="tube_diameter.js"></script>
+  <img src="res/tube_sample.png">
+  <br>
+  <button class="continue" onclick="loadNextPage()">
+    Continue
+  </button>
 </body>
 
 </html>

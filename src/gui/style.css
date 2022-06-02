@@ -1,0 +1,9 @@
+label {
+  padding: 20px;
+}
+
+.continue {
+  position: absolute;
+  bottom: 20px;
+  left: 50px;
+}
