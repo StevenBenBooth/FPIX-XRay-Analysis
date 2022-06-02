@@ -26,7 +26,7 @@ def save_png_to_gif(folder, save_path, duration=30):
         ), "Files to be combined must be PNG or JPEG format"
         new_frame = Image.open(
             join(folder, file)
-        )  # Can this read other file formats as well?
+        )  # I've only tried this with png, not jpeg. Not sure if you can mix them
         frames.append(new_frame)
 
     # Save into a GIF file that loops forever
@@ -44,7 +44,7 @@ def save_coverage_stats(source, save_folder, col_count):
     Takes either an excel filepath or an array to extract coverage statistics and save them.
     :param source: Source of the data to be processed, either as an excel filepath or as an array.
     :param save_folder: Folder to save the heatmap and coverage statistics to
-    :param col_count: The number of slices in the tracker data to be analyzed
+    :param col_count: The number of wedges in the tracker data to be analyzed
     """
     if isinstance(source, str) and source.endswith(".xlsx"):
         cols = [i for i in range(col_count + 1) if i != 0]
@@ -52,7 +52,10 @@ def save_coverage_stats(source, save_folder, col_count):
     else:
         array = source
 
-    rows, cols = array.shape
+    try:
+        rows, cols = array.shape
+    except:
+        raise ValueError("Source must be a numpy array or excel filepath!")
 
     slice_intensities = np.round(np.sum(array, 0) / rows, 4)
 
@@ -63,6 +66,7 @@ def save_coverage_stats(source, save_folder, col_count):
     )
     to_write.write("\nList of intensities by slice: " + str(slice_intensities))
 
+    # The following makes a nice heatmap
     img = 255 * np.ones((300, 300, 3), np.uint8)
     center = (150, 150)
     annulus = annulus_mask(img.shape[:2], center, 50, 30)

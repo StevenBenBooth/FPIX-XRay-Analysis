@@ -1,4 +1,9 @@
 """This module stores the global state, both gui settings and save paths"""
+# I'm justifying this global state with the fact that it is only set in one
+# part of the gui running, then never again (ideally). It may be worth locking
+# the state after it is set in the appropriate part of the program so it then
+# can't be changed. One way of doing this would be to refactor the properties into
+# one __setattr__ function, since the getters don't have custom behavior anyway
 import sys
 import os
 from os.path import join
@@ -25,6 +30,7 @@ class _Config:
         self.slice_path = None
         self.tube_path = None
         self.save_path = None
+        self.processed_path = None
 
     def check_path(self, path):
         if not os.path.isdir(path):
@@ -35,17 +41,20 @@ class _Config:
 
     def set_paths(self, base_path):
         try:
-            self.base_path = self.check_path(
+            base_path = self.check_path(
                 base_path
             )  # Obvious candidate for a setattr refactor, same as the next two
             self.slice_path = self.check_path(join(base_path, "Pictures"))
             self.tube_path = self.check_path(join(base_path, "Tube"))
-            self.save_path = join(self.base_path, "Processed")
-            os.mkdir(self.save_path)
-        except FileExistsError:
-            pass
+            self.processed_path = join(base_path, "Processed")
+            self.save_path = base_path
         except NotADirectoryError as e:
             raise e
+
+        try:
+            os.mkdir(self.processed_path)
+        except FileExistsError:
+            pass
 
     def update_params(self, *values):
         (

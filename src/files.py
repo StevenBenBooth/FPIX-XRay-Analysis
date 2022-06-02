@@ -27,7 +27,9 @@ def load_and_crop(path, slice):
 class _Files:
     def __init__(self, path):
         config.set_paths(path)
-        self.current_slice = 0
+        self.current_slice = (
+            -1
+        )  # Starts on -1, since the first call to next gets the index-0 index
         self.slice_imgs = os.listdir(config.slice_path)
         self.tube_imgs = os.listdir(config.tube_path)
         self.slice_total = len(self.slice_imgs)
@@ -40,7 +42,7 @@ class _Files:
 
     def __next__(self):
         """returns next (slice image, tube image) to be processed, each cropped"""
-        if self.current_slice >= self.slice_total:
+        if self.current_slice >= self.slice_total - 1:
             raise StopIteration
         res = (
             load_and_crop(config.slice_path, self.slice_imgs[self.current_slice]),
@@ -49,9 +51,12 @@ class _Files:
         self.current_slice += 1
         return res
 
+    def __len__(self):
+        return self.slice_total
+
     def save_img(self, img):
         cv2.imwrite(
-            join(config.save_path, "slice {}.png".format(self.current_slice)), img
+            join(config.processed_path, "slice {}.png".format(self.current_slice)), img
         )
 
     def get_tube_sample(self):
@@ -67,4 +72,4 @@ class _Files:
         )
 
     def get_progress(self):
-        return "{}/{} images processed".format(self.current_slice, self.slice_total)
+        return "{}/{} images processed".format(self.current_slice + 1, self.slice_total)

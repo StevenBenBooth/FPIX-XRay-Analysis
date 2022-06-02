@@ -116,6 +116,6 @@ function getFields() {
 
 
 function beginProcessing() {
-  eel.start_processing();
+  eel.update_params(getFields());
   window.open("progress.html", "_self");
 }
