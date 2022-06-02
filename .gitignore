@@ -1,5 +1,6 @@
-# Excludes the tube image displayed when selecting a radius
-src/gui/res/*
+# Excludes the sample images, but not the icon
+src/gui/res/tube_sample
+src/gui/res/slice_sample
 
 # Covers both JetBrains IDEs and VSCode
 ## Ignore Visual Studio temporary files, build results, and
