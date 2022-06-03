@@ -117,5 +117,5 @@ function getFields() {
 
 function beginProcessing() {
   eel.update_params(getFields());
-  window.open("progress.html", "_self", "width=650, height=800");
+  window.open("progress.html", "_self", "resizable=true, width=650, height=800");
 }

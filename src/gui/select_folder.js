@@ -7,5 +7,6 @@ function returnPath() {
 eel.expose(loadNextPage);
 function loadNextPage() {
   eel.update_tube_sample();
-  window.open("tube_diameter.html", "_self", "width=650, height=800");
+  // Sadly, the window cannot resize itself, so the last argument does nothing
+  window.open("tube_diameter.html", "_self", "resizable=true, width=650, height=800");
 }

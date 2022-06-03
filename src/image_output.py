@@ -30,13 +30,13 @@ def write_tube_sample(radius):
     x, y = circ[:2]
     tube_file = tube_input.copy()
     cv2.circle(tube_file, (x, y), radius, (255, 0, 0), 1)
-    cv2.imwrite("src/gui/res/tube_sample.png", tube_file)
+    cv2.imwrite("src/gui/img/tube_sample.png", tube_file)
 
 
 def write_image_sample():
     img, tube = files.slices.get_image_sample()
     processed_mask, tube_info = find_epoxy(img, tube, save_information=False)
     cv2.imwrite(
-        "src/gui/res/settings_sample.png",
+        "src/gui/img/settings_sample.png",
         person_output(img, processed_mask, tube_info),
     )

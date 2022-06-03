@@ -1,4 +1,4 @@
-const resultField = document.querySelector("textarea");
+const resultField = document.querySelector("div.textarea");
 
 function reload() {
   eel.update_radius(resultField.value); // saves inputted radius
@@ -9,12 +9,12 @@ function reload() {
 
 window.onload(updateInfo)
 function updateInfo() {
+  // window.resizeTo(650, 800) <-- I tried, this but chromium forbids the window from resizing itself 
   eel.get_radius()(x => resultField.innerHTML = x);
 }
-// document.addEventListener("DOMContentLoaded", updateInfo);
 
 function loadNextPage() {
   eel.update_radius(resultField.value);
   eel.update_slice_sample();
-  window.open("set_parameters.html", "_self", "width=400", "height=800");
+  window.open("set_parameters.html", "_self");
 }

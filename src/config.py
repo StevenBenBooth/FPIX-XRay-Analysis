@@ -87,14 +87,14 @@ class _Config:
         try:
             return int(val)
         except ValueError:
-            raise ValueError(name, " must be an integer or coercible to an integer")
+            raise ValueError(name + " must be an integer or coercible to an integer")
 
     def floatcast(self, val, name):
         assert isinstance(name, str), "The variable name should be a string"
         try:
             return float(val)
         except ValueError:
-            raise ValueError(name, " must be an float or coercible to a float")
+            raise ValueError(name + " must be an float or coercible to a float")
 
     # TODO: Refactor to only use __setattr__ in order to avoid bloat from getters
     @property

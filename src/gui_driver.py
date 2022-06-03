@@ -32,14 +32,14 @@ def update_params(params):
 
 
 @eel.expose
-def get_parameters():
-    # print(config.get_params())
-    return config.get_params()
+def get_radius():
+    return config.tube_radius
 
 
 @eel.expose
-def get_radius():
-    return config.tube_radius
+def get_parameters():
+    # print(config.get_params())
+    return config.get_params()
 
 
 @eel.expose
@@ -59,5 +59,5 @@ def log(val):
 
 # starting the application
 eel.start(
-    "select_folder.html", mode="chrome", size=(650, 300)
+    "select_folder.html", mode="chrome"
 )  # chrome looks nicer, but edge would work on machines without chrome installed
