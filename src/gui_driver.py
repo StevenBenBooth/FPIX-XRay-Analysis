@@ -59,5 +59,5 @@ def log(val):
 
 # starting the application
 eel.start(
-    "select_folder.html", mode="chrome"
+    "select_folder.html", mode="chrome", size=(650, 300)
 )  # chrome looks nicer, but edge would work on machines without chrome installed

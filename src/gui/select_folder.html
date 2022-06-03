@@ -1,7 +1,8 @@
-<html>
+<!DOCTYPE html>
+
+<html lang="en">
 
 <script type="text/javascript" src="/eel.js"></script>
-<link rel="stylesheet" href="select_folder.css">
 
 <head>
     <title>
@@ -12,11 +13,13 @@
 </head>
 
 <body>
-    <label>Input the folder path in which the tube and unprocessed images are</label>
-    <br>
-    <label>Base folder path:</label>
-    <textarea rows="1"></textarea>
-    <br>
+    <label>Input the folder path to the cross-section and tube pictures</label>
+    <!-- <br> -->
+    <div class="div1">
+        <label>Base folder path:</label>
+        <textarea class="folder" rows="1"></textarea>
+    </div>
+    <!-- <br> -->
     <!-- This one has to be in the body -->
     <script type="text/javascript" src="select_folder.js"></script>
     <button class="continue" type="button" onclick="returnPath()">
@@ -24,6 +27,6 @@
     </button>
 </body>
 
-
+<link rel="stylesheet" href="style.css">
 
 </html>

@@ -7,13 +7,14 @@ function reload() {
   window.location.reload(true);
 }
 
-window.onload = updateInfo;
+window.onload(updateInfo)
 function updateInfo() {
   eel.get_radius()(x => resultField.innerHTML = x);
 }
+// document.addEventListener("DOMContentLoaded", updateInfo);
 
 function loadNextPage() {
   eel.update_radius(resultField.value);
   eel.update_slice_sample();
-  window.open("set_parameters.html", "_self");
+  window.open("set_parameters.html", "_self", "width=400", "height=800");
 }
