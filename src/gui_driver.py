@@ -3,19 +3,19 @@ from files import setup
 import config
 from image_output import write_tube_sample, write_image_sample
 from process import process
-import sys
-import os
+# import sys
+# import os
 
 
-def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller"""
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
+# def resource_path(relative_path):
+#     """Get absolute path to resource, works for dev and for PyInstaller"""
+#     try:
+#         # PyInstaller creates a temp folder and stores path in _MEIPASS
+#         base_path = sys._MEIPASS
+#     except Exception:
+#         base_path = os.path.abspath(".")
 
-    return os.path.join(base_path, relative_path)
+#     return os.path.join(base_path, relative_path)
 
 
 # initializing the application (points to the folder containing the web components)

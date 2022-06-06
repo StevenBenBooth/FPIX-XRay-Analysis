@@ -7,7 +7,6 @@ import config
 
 slices = None
 
-
 def setup(path):
     config.set_paths(path)
     global slices
