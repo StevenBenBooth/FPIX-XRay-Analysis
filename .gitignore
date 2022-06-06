@@ -1,6 +1,6 @@
 # Excludes the sample images, but not the icon
-src/gui/img/tube_sample
-src/gui/img/slice_sample
+src/gui/img/tube_sample.png
+src/gui/img/settings_sample.png
 
 # Covers both JetBrains IDEs and VSCode
 ## Ignore Visual Studio temporary files, build results, and
