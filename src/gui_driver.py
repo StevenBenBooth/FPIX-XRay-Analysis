@@ -38,7 +38,6 @@ def get_radius():
 
 @eel.expose
 def get_parameters():
-    # print(config.get_params())
     return config.get_params()
 
 

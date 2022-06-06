@@ -29,7 +29,7 @@ def write_tube_sample(radius):
     circ = get_bound_circ(tube_input, radius)
     x, y = circ[:2]
     tube_file = tube_input.copy()
-    cv2.circle(tube_file, (x, y), radius, (255, 0, 0), 1)
+    cv2.circle(tube_file, (x, y), radius, (0, 255, 0), thickness=1)
     cv2.imwrite("src/gui/img/tube_sample.png", tube_file)
 
 
