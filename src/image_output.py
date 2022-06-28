@@ -3,10 +3,8 @@ import numpy as np
 import os
 import sys
 
-from epoxy import find_epoxy
 import files
-
-from epoxy import find_epoxy
+from process import find_epoxy
 from tube_analysis import get_bound_circ
 
 
