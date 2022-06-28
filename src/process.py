@@ -63,7 +63,8 @@ def find_epoxy(img, img_tube, save_information=True):
     )
 
     # This function returns information on the tube center
-    x, y, r = get_bound_circ(img_tube, config.tube_radius)
+    outer_tube = get_bound_circ(img_tube, config.tube_radius)
+    x, y, r = outer_tube
 
     # Creates a map that computes the euclidean distance of a pixel position to the identified tube center
     h, w = epoxy_mask.shape[:2]
@@ -71,10 +72,10 @@ def find_epoxy(img, img_tube, save_information=True):
     dist = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
 
     # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
-    epoxy_mask = np.where(dist <= r, epoxy_mask, 0)
+    epoxy_mask = np.where(dist <= r, 0, epoxy_mask)
 
     # Removes the carbon fiber from the epoxy mask
-    img_epoxy = remove_fiber(
+    epoxy_mask = remove_fiber(
         config.cf_bottom_bound,
         config.cf_top_bound,
         config.cf_thickness,
@@ -85,14 +86,14 @@ def find_epoxy(img, img_tube, save_information=True):
 
     # The highlights around the tube may be epoxy or may not. We need to interpolate whether they are or are not,
     # and to do so we need to extract the highlights
-    img_highlights = cv2.bitwise_and(
-        cv2.inRange(img_blur, config.highlight_low_bound, 255), not_tube_mask
+    hightlights_mask = cv2.bitwise_and(
+        cv2.inRange(img_blur, config.highlight_low_bound, 255), epoxy_mask
     )
 
-    img_interpolated = process_highlights(
+    final_mask = process_highlights(
         save_information,
-        img_epoxy,
-        img_highlights,
+        epoxy_mask,
+        hightlights_mask,
         outer_tube,
         config.num_wedges,
         config.highlight_thickness,
@@ -100,4 +101,4 @@ def find_epoxy(img, img_tube, save_information=True):
         config.epoxy_interp_thresh,
         interpolate_close_ker,
     )
-    return img_interpolated, outer_tube
+    return final_mask, outer_tube
