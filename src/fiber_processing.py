@@ -94,8 +94,8 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
 
 def _find_coords(top_bound, bot_bound, img):
     """Returns -1 for top and/or bottom if it doesn't find it in the bounds given"""
-    # This is gratefully stolen from the following stackoverflow post:
-    # https://stackoverflow.com/questions/47269390/how-to-find-first-non-zero-value-in-every-column-of-a-numpy-array
+    # This is gratefully stolen from user Divakar's StackOverflow answer:
+    # https://stackoverflow.com/a/47269413/19333140
     def first_nonzero(arr, axis=0, invalid_value=-1):
         # Create a mask with True for nonzero elements, False for zero elements
         mask = arr != 0
