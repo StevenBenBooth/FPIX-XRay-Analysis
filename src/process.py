@@ -58,29 +58,27 @@ def find_epoxy(img, img_tube, save_information=True):
     img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
 
     # Roughly identify the epoxy layer
-    img_epoxy_raw = cv2.inRange(
+    epoxy_mask = cv2.inRange(
         img_blur, config.epoxy_low_bound, config.highlight_low_bound
     )
 
     # This function returns information on the tube center
-    outer_tube = get_bound_circ(img_tube, config.tube_radius)
+    x, y, r = get_bound_circ(img_tube, config.tube_radius)
 
-    tube_mask = np.zeros(
-        img_epoxy_raw.shape[:2], np.uint8
-    )  # This mask is just the tube
+    # Creates a map that computes the euclidean distance of a pixel position to the identified tube center
+    h, w = epoxy_mask.shape[:2]
+    ys, xs = np.ogrid(h, w)
+    dist = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
 
-    x, y, r = outer_tube
-    cv2.circle(tube_mask, (x, y), r, 255, -1)
-    # Masks the rough epoxy to exclude inside the tube
-    not_tube_mask = 255 - tube_mask
-    img_epoxy_ntube = cv2.bitwise_and(img_epoxy_raw, img_epoxy_raw, mask=not_tube_mask)
+    # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
+    epoxy_mask = np.where(dist <= r, epoxy_mask, 0)
 
     # Removes the carbon fiber from the epoxy mask
     img_epoxy = remove_fiber(
         config.cf_bottom_bound,
         config.cf_top_bound,
         config.cf_thickness,
-        img_epoxy_ntube,
+        epoxy_mask,
         fiber_close_ker,
         open_ker,
     )
