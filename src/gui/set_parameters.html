@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<script type="text/javascript" src="/eel.js"></script>
+
+<head>
+  <title>Tube selection</title>
+  <link rel="shortcut icon" type="image/x-icon" href="img/icon.png">
+</head>
+
+<body>
+  <img src="img/settings_sample.png">
+
+  <table>
+    <tr>
+      <td>Number of wedges:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>Epoxy low bound:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>Highlight cutoff:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+
+    <tr>
+      <td>CF top bound:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>CF bottom bound:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>CF thickness:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>Highlight thickness:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>Interpolation threshold:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+    <tr>
+      <td>Epoxy interpolation threshold:</td>
+      <td><textarea></textarea></td>
+    </tr>
+
+  </table>
+  <br>
+
+  <button type="button" onclick="reload()">Update image</button>
+
+  <button class="continue" onclick="beginProcessing()">Begin processing</button>
+
+  <script type="text/javascript" src="set_parameters.js"></script>
+
+</body>
+
+<link rel="stylesheet" href="css/style.css">
+
+</html>
+
+<!-- If you would like sliders, see https://www.w3schools.com/howto/howto_js_rangeslider.asp -->
+<!-- I tried, but ended up just cutting my losses -->
+
+<!-- <label>Number of wedges</label>
+  <div class="slidecontainer">
+    <input type="range" min="2" max="100" value="50" class="slider" id="num-wedges">
+    <p>Value: <span></span></p>
+  </div>
+  <br>
+  <label>Epoxy low bound</label>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="100" value="40" class="slider" id="epox-low-bound">
+    <p>Value: <span></span></p>
+
+  </div>
+  <br>
+  <label>Highlight cutoff</label>
+  <div class="slidecontainer">
+    <input type="range" min="150" max="255" value="210" class="slider" id="highlight-cutoff">
+    <p>Value: <span></span></p>
+
+  </div>
+  <br>
+  <label>CF top bound</label>
+  <div class="slidecontainer">
+    <input type="range" min="40" max="90" value="70" class="slider" id="cf-top-bound">
+    <p>Value: <span></span></p>
+
+  </div>
+  <br>
+  <label>CF bottom bound</label>
+  <div class="slidecontainer">
+    <input type="range" min="150" max="200" value="173" class="slider" id="cf-bottom-bound">
+    <p>Value: <span></span></p>
+
+  </div>
+  <br>
+  <label>CF thickness</label>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="15" value="7" class="slider" id="cf-thickness">
+    <p>Value: <span></span></p>
+
+  </div>
+
+  <br>
+  <label>Highlight thickness</label>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="15" value="9" class="slider" id="highlight-thickness">
+    <p>Value: <span></span></p>
+
+  </div>
+
+  <br>
+  <label>Interpolation threshold</label>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="1" value="0.7" step="0.05" class="slider" id="interpolation-thresh">
+    <p>Value: <span></span></p>
+
+  </div>
+
+  <br>
+  <label>Epoxy interp. threshold</label>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="1" value="0" step="0.05" class="slider" id="epox-interp-thresh">
+    <p>Value: <span></span></p>
+
+  </div> -->

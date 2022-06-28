@@ -1,0 +1,46 @@
+body {
+  background-color: whitesmoke;
+}
+
+* {
+  font-size: 1em;
+}
+
+.div1 {
+  padding: 20px 0px;
+  vertical-align: top;
+}
+
+textarea {
+  font-size: 1.25em;
+  padding: 0px;
+  height: 30px;
+  width: auto;
+  overflow: hidden;
+  resize: none;
+
+}
+
+.folder {
+  width: 350px;
+}
+
+button {
+  color: whitesmoke;
+  border: none;
+  padding: 5px;
+  border-radius: 6px;
+  background-color: rgb(224, 83, 58);
+}
+
+.continue {
+  font-weight: bold;
+  position: absolute;
+  padding: 20px;
+  bottom: 20px;
+  right: 50px;
+}
+
+img {
+  padding: 10px;
+}
