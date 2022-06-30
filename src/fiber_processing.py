@@ -17,7 +17,8 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     """
 
     assert isinstance(top_bound, int), "top_upper_bound must be an integer"
-    assert isinstance(bottom_bound, int), "bottom_lower_bound must be an integer"
+    assert isinstance(
+        bottom_bound, int), "bottom_lower_bound must be an integer"
     assert isinstance(thickness, int), "thickness must be an integer"
     rough_mask = np.ones(mask.shape[:2], np.uint8)
     rows, cols = mask.shape
@@ -27,7 +28,8 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     closed_fiber = cv2.morphologyEx(
         fiber_parts, cv2.MORPH_CLOSE, close_ker, iterations=4
     )  # Closes up the fiber parts so the removal works better
-    top_coords, bottom_coords = _find_coords(top_bound, bottom_bound, closed_fiber)
+    top_coords, bottom_coords = _find_coords(
+        top_bound, bottom_bound, closed_fiber)
 
     # Creates an array whose values index row position
     row_vals = np.arange(rows).reshape(rows, 1)
@@ -91,6 +93,7 @@ def _find_coords(top_bound, bot_bound, img):
         return np.where(mask.any(axis=axis), val, invalid_value)
 
     top_coords = first_nonzero(img[:top_bound, :]).reshape((1, -1))
-    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0]).reshape((1, -1))
+    bottom_coords = last_nonzero(
+        img[bot_bound:, :], img.shape[0]).reshape((1, -1))
 
     return top_coords, bottom_coords

@@ -47,7 +47,8 @@ def get_crust_masks(img_dim, tube_circle, number_slices, thickness):
 
     for x in range(x_min, x_max):
         for y in range(y_min, y_max):
-            slices[int(get_angle(x, y, (cent_x, cent_y)) / angle_swept)][x][y] = 255
+            slices[int(get_angle(x, y, (cent_x, cent_y)) /
+                       angle_swept)][x][y] = 255
 
     crusts = []
     for slice in slices:

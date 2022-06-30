@@ -70,7 +70,8 @@ def save_coverage_stats(source, save_folder, col_count):
         for j in range(img.shape[1]):
             if annulus[i][j] == 255:
                 R, G, B = cm.cividis(
-                    slice_intensities[int(get_angle(i, j, center) / slice_angle)]
+                    slice_intensities[int(
+                        get_angle(i, j, center) / slice_angle)]
                 )[:3]
 
                 img[i][j] = [255 * a for a in [B, G, R]]

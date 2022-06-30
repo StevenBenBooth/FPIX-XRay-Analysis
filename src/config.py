@@ -99,7 +99,8 @@ class _Config:
     def parse_bounds(self, val, name):
         # Converts the JavaScript string representation of the integer bounds into a tuple of integers
         return self.js_cast(
-            lambda x: tuple(map(self.intcast, x.replace("\[|]", "")).split(", ")),
+            lambda x: tuple(
+                map(self.intcast, x.replace("\[|]", "")).split(", ")),
             val,
             name,
         )
