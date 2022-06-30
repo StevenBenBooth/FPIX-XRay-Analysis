@@ -50,20 +50,26 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
 
 def _find_coords(top_bound, bot_bound, closed_img, img_dim):
     """Returns -1 for top and/or bottom if it doesn't find it in the bounds given"""
-    rows, cols = img_dim
-    top_coords = []
-    bottom_coords = []
-    for j in range(cols):
-        top_found = False
-        top = -1
-        bottom = -1
-        for i in range(rows):
-            if closed_img[i][j] == 255:
-                if not top_found and i < top_bound:
-                    top_found = True
-                    top = i
-                elif i >= bot_bound:
-                    bottom = i
-        top_coords.append(top)
-        bottom_coords.append(bottom)
+    # This is gratefully stolen from user Divakar's StackOverflow answer:
+    # https://stackoverflow.com/a/47269413/19333140
+    def first_nonzero(arr, axis=0, invalid_value=-1):
+        # Create a mask with True for nonzero elements, False for zero elements
+        mask = arr != 0
+        # If there are any True values along the column, put the index of its first occurence
+        # in the array. Otherwise, put invalid_value into the output array
+        return np.where(mask.any(axis=axis), arr.argmax(axis=axis), invalid_value)
+
+    def last_nonzero(arr, axis_length, axis=0, invalid_value=-1):
+        mask = arr != 0
+
+        # To take advantage of the argmax behavior, we need to flip the array;
+        # this way, the first argmax coord will correspond to the last nonzero element in that column
+        # We need to compensate for the effect of this flip
+        val = axis_length - np.flip(mask, axis=axis).argmax(axis=axis) - 1
+
+        return np.where(mask.any(axis=axis), val, invalid_value)
+
+    top_coords = first_nonzero(img[:top_bound, :]).reshape((1, -1))
+    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0]).reshape((1, -1))
+
     return top_coords, bottom_coords

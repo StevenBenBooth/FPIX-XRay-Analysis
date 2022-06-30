@@ -1,12 +1,17 @@
 import eel
+import cv2
+import numpy as np
 import pandas as pd
-
-import config
 from os.path import join
+
 import files
-from epoxy import find_epoxy
+import config
 from image_output import person_output
 from stat_tracker import StatTracker
+from fiber_processing import remove_fiber
+from tube_interpolate import process_highlights
+from tube_analysis import get_bound_circ
+
 import tracker_analysis
 
 
@@ -33,3 +38,66 @@ def process():
         config.processed_path, join(folder, "processed.gif")
     )
     # config.save_settings(join(folder, "settings.txt"))
+
+
+def find_epoxy(img, img_tube, save_information=True):
+    """Performs all the actions required to extract the epoxy from the image"""
+
+    # These kernels don't need to be touched (most likely)
+    open_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    fiber_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 5))
+    interpolate_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    blur_ker = (5, 5)
+
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # opening then blur found to be better than blur then opening--makes sense since blur spreads out the foam features
+    # First opening is used to remove some foam features
+    img_open = cv2.morphologyEx(img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
+    img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
+
+    # Roughly identify the epoxy layer
+    epoxy_mask = cv2.inRange(
+        img_blur, config.epoxy_low_bound, config.highlight_low_bound
+    )
+
+    # This function returns information on the tube center
+    outer_tube = get_bound_circ(img_tube, config.tube_radius)
+    x, y, r = outer_tube
+
+    # Creates a map that computes the euclidean distance of a pixel position to the identified tube center
+    h, w = epoxy_mask.shape[:2]
+    ys, xs = np.ogrid(h, w)
+    dist = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
+
+    # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
+    epoxy_mask = np.where(dist <= r, 0, epoxy_mask)
+
+    # Removes the carbon fiber from the epoxy mask
+    epoxy_mask = remove_fiber(
+        config.cf_bottom_bound,
+        config.cf_top_bound,
+        config.cf_thickness,
+        epoxy_mask,
+        fiber_close_ker,
+        open_ker,
+    )
+
+    # The highlights around the tube may be epoxy or may not. We need to interpolate whether they are or are not,
+    # and to do so we need to extract the highlights
+    hightlights_mask = cv2.bitwise_and(
+        cv2.inRange(img_blur, config.highlight_low_bound, 255), epoxy_mask
+    )
+
+    final_mask = process_highlights(
+        save_information,
+        epoxy_mask,
+        hightlights_mask,
+        outer_tube,
+        config.num_wedges,
+        config.highlight_thickness,
+        config.interpolation_thresh,
+        config.epoxy_interp_thresh,
+        interpolate_close_ker,
+    )
+    return final_mask, outer_tube
