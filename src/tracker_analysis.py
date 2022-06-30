@@ -3,9 +3,11 @@ import pandas as pd
 import matplotlib.cm as cm
 import cv2
 import os
-import math
 from os.path import join
+import math
+import imageio
 from PIL import Image
+
 
 from crust_slices import get_angle, annulus_mask
 
@@ -20,23 +22,15 @@ def save_png_to_gif(folder, save_path, duration=30):
     """
     assert save_path.endswith(".gif"), "Save path must end in .gif"
     frames = []
-    for file in os.listdir(folder):
-        assert file.endswith(".png") or file.endswith(
-            ".jpg"
-        ), "Files to be combined must be PNG or JPEG format"
-        new_frame = Image.open(
-            join(folder, file)
-        )  # I've only tried this with png, not jpeg. Not sure if you can mix them
-        frames.append(new_frame)
-
-    # Save into a GIF file that loops forever
-    frames[0].save(
-        save_path,
-        format="GIF",
-        append_images=frames[1:],
-        save_all=True,
-        duration=duration,
-    )
+    with imageio.get_writer("smiling.gif", mode="I") as writer:
+        for file in os.listdir(folder):
+            assert file.endswith(".png") or file.endswith(
+                ".jpg"
+            ), "Files to be combined must be PNG or JPEG format"
+            new_frame = Image.open(
+                join(folder, file)
+            )  # I've only tried this with png, not jpeg. Not sure if you can mix them
+            frames.append_data(new_frame)
 
 
 def save_coverage_stats(source, save_folder, col_count):
