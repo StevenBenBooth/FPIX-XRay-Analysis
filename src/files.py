@@ -18,10 +18,10 @@ def setup(path):
 
 
 def load_and_crop(path, slice):
-    return cv2.imread(join(path, slice))[
-        100:350, 75:575
-    ]  # When treating image as a matrix, height then width. The OpenCV convention
+    left, right, top, bottom = config.cropping_bounds
+    # When treating image as a matrix, height then width. The OpenCV convention
     # is width then height
+    return cv2.imread(join(path, slice))[top:bottom, left:right]
 
 
 class _Files:
@@ -45,8 +45,10 @@ class _Files:
         if self.current_slice >= self.slice_total - 1:
             raise StopIteration
         res = (
-            load_and_crop(config.slice_path, self.slice_imgs[self.current_slice]),
-            load_and_crop(config.tube_path, self.tube_imgs[self.current_slice]),
+            load_and_crop(config.slice_path,
+                          self.slice_imgs[self.current_slice]),
+            load_and_crop(config.tube_path,
+                          self.tube_imgs[self.current_slice]),
         )
         self.current_slice += 1
         return res
@@ -56,7 +58,8 @@ class _Files:
 
     def save_img(self, img):
         cv2.imwrite(
-            join(config.processed_path, "slice {}.png".format(self.current_slice)), img
+            join(config.processed_path, "slice {}.png".format(
+                self.current_slice)), img
         )
 
     def get_tube_sample(self):

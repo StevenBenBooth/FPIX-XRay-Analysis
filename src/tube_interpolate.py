@@ -42,7 +42,8 @@ def process_highlights(
     assert 0 <= epox_thresh <= 1, "epox_thresh must be between 0 and 1"
 
     result = start_epoxy_mask.copy()
-    masks = get_crust_masks(start_epoxy_mask.shape, tube_circle, precision, thickness)
+    masks = get_crust_masks(start_epoxy_mask.shape,
+                            tube_circle, precision, thickness)
 
     for i in range(len(masks)):
         crust = masks[i]

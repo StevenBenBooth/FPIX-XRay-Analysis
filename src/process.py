@@ -25,6 +25,7 @@ def process():
         if (i + 1) % 5 == 0:
             eel.update(files.slices.get_progress())
     eel.update(files.slices.get_progress())
+
     # I haven't been doing anything with the area stats. They give information
     # on the distribution along the tube. This could be useful later on if you
     # notice that the dispensor works better for earlier dispensing
@@ -53,7 +54,8 @@ def find_epoxy(img, img_tube, save_information=True):
 
     # opening then blur found to be better than blur then opening--makes sense since blur spreads out the foam features
     # First opening is used to remove some foam features
-    img_open = cv2.morphologyEx(img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
+    img_open = cv2.morphologyEx(
+        img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
     img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
 
     # Roughly identify the epoxy layer
