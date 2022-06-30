@@ -59,6 +59,7 @@ def save_coverage_stats(source, save_folder, col_count):
         + str(np.round(np.sum(array) / (cols * rows), 4))
     )
     to_write.write("\nList of intensities by slice: " + str(slice_intensities))
+    to_write.close()
 
     # The following makes a nice heatmap
     img = 255 * np.ones((300, 300, 3), np.uint8)
