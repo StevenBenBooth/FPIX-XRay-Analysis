@@ -1,7 +1,5 @@
-from venv import create
 import cv2
 import numpy as np
-import functools
 
 
 def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
@@ -50,29 +48,8 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
 
     bottom_conditions = create_conditions(fiber_distance_bottom)
 
-    # def promote_dim(conditions):  # There may be a simpler implementation for this
-    #     for i in range(len(conditions)):
-    #         conditions[i] = conditions[i][:, np.newaxis]
-    #     return conditions
-
-    # def composite_mask(conditions, type="and"):
-    #     if type == "and":
-    #         fun = np.all
-    #     elif type == "or":
-    #         fun = np.any
-    #     else:
-    #         raise ValueError("Type must be 'any' or 'or'")
-    #     return np.where(
-    #         fun(np.stack(promote_dim(conditions), axis=-1), axis=-1), 1, 0
-    #     )  # only selects values that satisfy all the conditions at once
-
-    def composite_mask(conditions, type="and"):
+    def composite_mask(conditions, fun):
         assert len(conditions) > 0, "Must have at least one condition"
-        if type == "and":
-            fun = np.logical_and
-        elif type == "or":
-            fun = np.logical_or
-
         # Folds masks together
         (
             mask,
@@ -82,9 +59,9 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
             mask = fun(mask, condition)
         return mask
 
-    top = composite_mask(top_conditions)
-    bot = composite_mask(bottom_conditions)
-    combined = composite_mask([top, bot], type="or")
+    top = composite_mask(top_conditions, np.logical_and)
+    bot = composite_mask(bottom_conditions, np.logical_or)
+    combined = composite_mask([top, bot], np.logical_or)
 
     mask = np.subtract(mask, combined)
 
