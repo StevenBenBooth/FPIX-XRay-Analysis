@@ -18,10 +18,10 @@ def setup(path):
 
 
 def load_and_crop(path, slice):
-    left, right, top, bottom = config.cropping_bounds
-    # When treating image as a matrix, height then width. The OpenCV convention
+    return cv2.imread(join(path, slice))[
+        100:350, 75:575
+    ]  # When treating image as a matrix, height then width. The OpenCV convention
     # is width then height
-    return cv2.imread(join(path, slice))[top:bottom, left:right]
 
 
 class _Files:

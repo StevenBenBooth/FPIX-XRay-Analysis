@@ -20,7 +20,6 @@ def process():
         if (i + 1) % 5 == 0:
             eel.update(files.slices.get_progress())
     eel.update(files.slices.get_progress())
-
     # I haven't been doing anything with the area stats. They give information
     # on the distribution along the tube. This could be useful later on if you
     # notice that the dispensor works better for earlier dispensing

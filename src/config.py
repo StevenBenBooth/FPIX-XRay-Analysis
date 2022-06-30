@@ -1,33 +1,32 @@
 """This module stores the global state, both gui settings and save paths"""
+# I'm justifying this global state with the fact that it is only set in one
+# part of the gui running, then never again (ideally). It may be worth locking
+# the state after it is set in the appropriate part of the program so it then
+# can't be changed. One way of doing this would be to refactor the properties into
+# one __setattr__ function, since the getters don't have custom behavior anyway
 import sys
 import os
-import numpy as np
 from os.path import join
 from tkinter import messagebox
-from typing import Any
 
 
 class _Config:
     def __init__(self):
-        self.tube_radius = 33
-
-        # Use width then height
-        self.cropping_bounds = (75, 575, 100, 350)
-
-        self.num_wedges = 50
-        self.epoxy_low_bound = 40
+        self._tube_radius = 33
+        self._num_wedges = 50
+        self._epoxy_low_bound = 40
         # highlight low bound is both the lower intensity bound for pixels to be
         # interpreted as a highlight and the upper bound for them to be interpreted as epoxy
-        self.highlight_low_bound = 210
-        self.cf_top_bound = (
+        self._highlight_low_bound = 210
+        self._cf_top_bound = (
             70  # top_bound < bottom_bound because indexing starts from the top
         )
         # These bounds should be set to the y-position of somewhere in the carbon foam layers
-        self.cf_bottom_bound = 173
-        self.cf_thickness = 7
-        self.highlight_thickness = 9
-        self.interpolation_thresh = 0.7
-        self.epoxy_interp_thresh = 0
+        self._cf_bottom_bound = 173
+        self._cf_thickness = 7
+        self._highlight_thickness = 9
+        self._interpolation_thresh = 0.7
+        self._epoxy_interp_thresh = 0
         self.slice_path = None
         self.tube_path = None
         self.save_path = None
@@ -71,7 +70,7 @@ class _Config:
         ) = values
 
     def get_params(self):  # TODO: make this stuff prettier if possible
-        return (
+        return [
             self.num_wedges,
             self.epoxy_low_bound,
             self.highlight_low_bound,
@@ -81,126 +80,147 @@ class _Config:
             self.highlight_thickness,
             self.interpolation_thresh,
             self.epoxy_interp_thresh,
-        )
-
-    def js_cast(self, fun, val, name):
-        assert isinstance(name, str), "The variable name should be a string"
-        try:
-            return fun(val)
-        except ValueError:
-            raise ValueError(name + " was not coercible to the correct type")
+        ]
 
     def intcast(self, val, name):
-        return self.js_cast(int, val, name)
+        assert isinstance(name, str), "The variable name should be a string"
+        try:
+            return int(val)
+        except ValueError:
+            raise ValueError(name + " must be an integer or coercible to an integer")
 
     def floatcast(self, val, name):
-        return self.js_cast(float, val, name)
+        assert isinstance(name, str), "The variable name should be a string"
+        try:
+            return float(val)
+        except ValueError:
+            raise ValueError(name + " must be an float or coercible to a float")
 
-    def parse_bounds(self, val, name):
-        # Converts the JavaScript string representation of the integer bounds into a tuple of integers
-        return self.js_cast(
-            lambda x: tuple(map(self.intcast, x.replace("\[|]", "")).split(", ")),
-            val,
-            name,
-        )
+    # TODO: Refactor to only use __setattr__ in order to avoid bloat from getters
+    @property
+    def tube_radius(self):
+        return self._tube_radius
 
-    def __setattr__(self, __name: str, __value: Any) -> None:
-        val = None
-        if __name == "tube_radius":
-            val = self.intcast(__value, "Radius")
-            assert val > 0, "Tube radius must be positive"
+    @tube_radius.setter
+    def tube_radius(self, val):
+        radius = self.intcast(val, "Radius")
+        assert radius > 0, "Tube radius must be positive"
+        self._tube_radius = radius
 
-        elif __name == "num_wedges":
-            val = self.intcast(__value, "Wedge count")
-            assert val > 0, "The number of interpolation slices must be positive"
+    @property
+    def num_wedges(self):
+        return self._num_wedges
 
-        elif __name == "epoxy_low_bound":
-            val = self.intcast(__value, "Epoxy low bound")
-            assert (
-                val >= 0 and val <= 255
-            ), "The low cutoff for epoxy must be an integer in 0, ..., 255"
+    @num_wedges.setter
+    def num_wedges(self, val):
+        num = self.intcast(val, "Wedge count")
+        assert num > 0, "The number of interpolation slices must be positive"
+        self._num_wedges = num
 
-        elif __name == "highlight_low_bound":
-            val = self.intcast(__value, "Highlight low cutoff")
-            assert (
-                val >= 0 and val <= 255
-            ), "The cutoff intensity for highlights must be in 0, ..., 255"
-            assert (  # note: this assertion makes things complicated, restricting one to updating the epoxy bound before the highlight bound (or else an exception could crop up)
-                val > self.epoxy_low_bound
-            ), "The low cutoff for highlights must be greater than the low cutoff for epoxy"
+    @property
+    def epoxy_low_bound(self):
+        return self._epoxy_low_bound
 
-        elif __name == "cf_top_bound":
-            val = self.intcast(__value, "Carbon Foam top bound")
-            assert val >= 0, "The carbon foam top bound must be a nonnegative integer"
+    @epoxy_low_bound.setter
+    def epoxy_low_bound(self, val):
+        low_bound = self.intcast(val, "Epoxy low bound")
+        assert (
+            low_bound >= 0 and low_bound <= 255
+        ), "The low cutoff for epoxy must be an integer in 0, ..., 255"
+        self._epoxy_low_bound = low_bound
 
-        elif __name == "cf_bottom_bound":
-            val = self.intcast(__value, "Carbon Foam bottom bound")
-            assert (
-                val >= 0
-            ), "The carbon foam bottom bound must be a nonnegative integer"
-            assert (
-                val > self.cf_top_bound
-            ), "Counterintuitively, the cf bottom bound should should be higher than the cf top bound (numpy indexing is the opposite of how the picture looks)"
+    @property
+    def highlight_low_bound(self):
+        return self._highlight_low_bound
 
-        elif __name == "cf_thickness":
-            val = self.intcast(__value, "Carbon Foam thickness")
-            assert val >= 0, "Carbon foam thickness should be nonnegative"
+    @highlight_low_bound.setter
+    def highlight_low_bound(self, val):
+        low_bound = self.intcast(val, "Highlight low cutoff")
+        assert (
+            low_bound >= 0 and low_bound <= 255
+        ), "The cutoff intensity for highlights must be in 0, ..., 255"
+        assert (
+            low_bound > self.epoxy_low_bound
+        ), "The low cutoff for highlights must be greater than the low cutoff for epoxy"
+        self._highlight_low_bound = low_bound
 
-        elif __name == "highlight_thickness":
-            val = self.intcast(__value, "Highlight thickness")
-            assert val >= 0, "Highlight thickness should be nonnegative"
+    @property
+    def cf_top_bound(self):
+        return self._cf_top_bound
 
-        elif __name == "interpolation_thresh":
-            val = self.floatcast(__value, "Interpolation threshold")
-            assert (
-                val >= 0 and val <= 1
-            ), "The interpolation threshold is a proportion, so must be in the interval [0, 1]"
+    @cf_top_bound.setter
+    def cf_top_bound(self, val):
+        top_bound = self.intcast(val, "Carbon Foam top bound")
 
-        elif __name == "epoxy_interp_thresh":
-            val = self.floatcast(__value, "Epoxy threshold")
-            assert (
-                val >= 0 and val <= 1
-            ), "The epoxy interpolation threshold is a proportion, so must be in the interval [0, 1]"
+        assert top_bound >= 0, "The carbon foam top bound must be a nonnegative integer"
+        self._cf_top_bound = top_bound
 
-        elif __name == "cropping_bounds":
-            val = self.parse_bounds(__value, "Cropping bounds")
-            left, right, top, bottom = val
-            assert np.any(
-                np.array(map(lambda x: not isinstance(x, int), val))
-            ), "Bounds must be integers"
-            assert (
-                top < bottom
-            ), "Due to numpy conventions, the top bound must have a lower value than the bottom bound for the image's height"
+    @property
+    def cf_bottom_bound(self):
+        return self._cf_bottom_bound
 
-            assert (
-                left < right
-            ), "The left bound must have a lower value than the right value for image cropping"
+    @cf_bottom_bound.setter
+    def cf_bottom_bound(self, val):
+        bottom_bound = self.intcast(val, "Carbon Foam bottom bound")
 
-        if val is not None:
-            super().__setattr__(
-                __name, val
-            )  # Has to add the typecast value for non-string attributes
-        else:
-            super().__setattr__(
-                __name, __value
-            )  # Default behavior for adding attribute to this object
+        assert (
+            bottom_bound >= 0
+        ), "The carbon foam bottom bound must be a nonnegative integer"
+        assert (
+            bottom_bound > self._cf_top_bound
+        ), "Counterintuitively, the cf bottom bound should should be higher than the cf top bound (numpy indexing is the opposite of how the picture looks)"
+        self._cf_bottom_bound = bottom_bound
 
-    def __getattribute__(self, __name: str) -> Any:
-        return super().__getattribute__(__name)
+    @property
+    def cf_thickness(self):
+        return self._cf_thickness
+
+    @cf_thickness.setter
+    def cf_thickness(self, val):
+        thickness = self.intcast(val, "Carbon Foam thickness")
+        assert thickness >= 0, "Carbon foam thickness should be nonnegative"
+        self._cf_thickness = thickness
+
+    @property
+    def highlight_thickness(self):
+        return self._highlight_thickness
+
+    @highlight_thickness.setter
+    def highlight_thickness(self, val):
+        thickness = self.intcast(val, "Highlight thickness")
+
+        assert thickness >= 0, "Highlight thickness should be nonnegative"
+        self._highlight_thickness = thickness
+
+    @property
+    def interpolation_thresh(self):
+        return self._interpolation_thresh
+
+    @interpolation_thresh.setter
+    def interpolation_thresh(self, val):
+        thresh = self.floatcast(val, "Interpolation threshold")
+        assert (
+            thresh >= 0 and thresh <= 1
+        ), "The interpolation threshold is a proportion, so must be in the interval [0, 1]"
+        self._interpolation_thresh = thresh
+
+    @property
+    def epoxy_interp_thresh(self):
+        return self._epoxy_interp_thresh
+
+    @epoxy_interp_thresh.setter
+    def epoxy_interp_thresh(self, val):
+        thresh = self.floatcast(val, "Epoxy threshold")
+        assert (
+            thresh >= 0 and thresh <= 1
+        ), "The epoxy interpolation threshold is a proportion, so must be in the interval [0, 1]"
+        self._epoxy_interp_thresh = thresh
 
 
-# To take advantage of overwriting __setattr__, we need to use a trick.
-# We use the following trick to replace this module in the system with
-# an instance of the above class, so that our custom __setattr__ behavior gets
-# called whenever we change an attribute of the program.
+# Properties must exist as attributes of a class, rather than of an instance.
+# However, modules are (roughly) singleton instances of an internal module class.
+# As a result, we use the following trick to replace this module in the system with
+# an instance of the above class, for which properties are class attributes
 # See the top reply on this StackOverflow for more information on the trick:
 # https://stackoverflow.com/questions/2447353/getattr-on-a-module
-
-# If, at some point in the future, one wishes to add specialized behavior on
-# getters as well as setters, it may be worth replacing this implementation with
-# one using properties. Modules are (roughly) singleton instances of an internal
-# module class. However, properties must exist as attributes of a class, rather
-# than of an instance, so we use this trick to replace the (instance) module with
-# the above class.
-# Release 0.1.0 has an implementation of these attributes as properties.
 sys.modules["config"] = _Config()

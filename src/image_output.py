@@ -23,8 +23,7 @@ def resource_path(relative_path):
 
 def person_output(img, epoxy_mask, circle):
     """Takes in the raw image, base color, epoxy mask, and circle to make a nice processed image"""
-    height, width, _ = img.shape
-    red = np.full((height, width, 3), [0, 0, 255], dtype=np.uint8)
+    red = np.full((250, 500, 3), [0, 0, 255], dtype=np.uint8)
 
     x, y, r = circle
     a = cv2.bitwise_and(img, red, mask=epoxy_mask)

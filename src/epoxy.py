@@ -13,7 +13,7 @@ def find_epoxy(img, img_tube, save_information=True):
 
     # These kernels don't need to be touched (most likely)
     open_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    fiber_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 5))
+    fiber_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     interpolate_close_ker = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     blur_ker = (5, 5)
 
