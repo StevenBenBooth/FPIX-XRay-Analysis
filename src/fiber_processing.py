@@ -48,7 +48,7 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     return result
 
 
-def _find_coords(top_bound, bot_bound, closed_img, img_dim):
+def _find_coords(top_bound, bot_bound, img):
     """Returns -1 for top and/or bottom if it doesn't find it in the bounds given"""
     # This is gratefully stolen from user Divakar's StackOverflow answer:
     # https://stackoverflow.com/a/47269413/19333140
