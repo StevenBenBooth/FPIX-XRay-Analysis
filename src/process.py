@@ -54,8 +54,7 @@ def find_epoxy(img, img_tube, save_information=True):
 
     # opening then blur found to be better than blur then opening--makes sense since blur spreads out the foam features
     # First opening is used to remove some foam features
-    img_open = cv2.morphologyEx(
-        img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
+    img_open = cv2.morphologyEx(img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
     img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
 
     # Roughly identify the epoxy layer
@@ -69,7 +68,7 @@ def find_epoxy(img, img_tube, save_information=True):
 
     # Creates a map that computes the euclidean distance of a pixel position to the identified tube center
     h, w = epoxy_mask.shape[:2]
-    ys, xs = np.ogrid(h, w)
+    ys, xs = np.ogrid[0:h, 0:w]
     dist = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
 
     # Sets all points of the mask within the tube circle to 0, removing the tube from the mask

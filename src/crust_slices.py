@@ -10,10 +10,10 @@ def get_crust_masks(img_dim, tube_circle, number_slices, thickness):
     Parameters
     ----------
     :param img_dim: 2D array
-        Dimensions of image to be processed.
+        Dimensions required for the masks.
     :param tube_circle: tuple (int, int, int)
         Tuple (x, y, r) containing information about tube outer diameter. (x, y) denotes tube's center in
-        numpy coordinates (x and y switched for numpy and cv2), and r denotes the tube's radius.
+        numpy coordinates (note x and y are inconsistent between numpy and cv2), and r denotes the tube's radius in pixels.
     :param int number_slices:
         Must be a positive integer. Denotes the number of crusts to slice. ie, 1 would return a full annulus, 2 would
         return two half-annuli, etc.
@@ -41,14 +41,11 @@ def get_crust_masks(img_dim, tube_circle, number_slices, thickness):
     )  # Awkward indexing courtesy of
     # numpy/opencv indexing inconsistency
 
-    slices = []
-    for i in range(number_slices):
-        slices.append(np.zeros(img_dim, np.uint8))
+    slices = [np.zeros(img_dim, np.uint8) for _ in range(number_slices)]
 
-    for x in range(x_min, x_max):
+    for x in range(x_min, x_max):  # TODO: refactor with np ogrid and broadcasting
         for y in range(y_min, y_max):
-            slices[int(get_angle(x, y, (cent_x, cent_y)) /
-                       angle_swept)][x][y] = 255
+            slices[int(get_angle(x, y, (cent_x, cent_y)) / angle_swept)][x][y] = 255
 
     crusts = []
     for slice in slices:

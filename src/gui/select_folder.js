@@ -8,5 +8,5 @@ eel.expose(loadNextPage);
 function loadNextPage() {
   eel.update_tube_sample();
   // Sadly, the window cannot resize itself, so we can't use height/width arguments
-  window.open("tube_diameter.html", "_self");
+  window.open("set_radius.html", "_self");
 }

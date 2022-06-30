@@ -12,13 +12,12 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     :param int thickness: The thickness of the carbon fiber layer to be excluded from the mask
     :param arr mask: The mask to be processed
     :param arr close_ker: The kernel to close the fiber chunks together before finding bounds
-    :param arr open_ker: The kernel to clean up little pieces of fiber left over
+    :param arr open_ker: The kernel to clean up little pieces of fiber left over after the main removal
     :returns arr result: mask without carbon foam
     """
 
     assert isinstance(top_bound, int), "top_upper_bound must be an integer"
-    assert isinstance(
-        bottom_bound, int), "bottom_lower_bound must be an integer"
+    assert isinstance(bottom_bound, int), "bottom_lower_bound must be an integer"
     assert isinstance(thickness, int), "thickness must be an integer"
     rough_mask = np.ones(mask.shape[:2], np.uint8)
     rows, cols = mask.shape
@@ -28,8 +27,7 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     closed_fiber = cv2.morphologyEx(
         fiber_parts, cv2.MORPH_CLOSE, close_ker, iterations=4
     )  # Closes up the fiber parts so the removal works better
-    top_coords, bottom_coords = _find_coords(
-        top_bound, bottom_bound, closed_fiber)
+    top_coords, bottom_coords = _find_coords(top_bound, bottom_bound, closed_fiber)
 
     # Creates an array whose values index row position
     row_vals = np.arange(rows).reshape(rows, 1)
@@ -50,9 +48,9 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
 
     bottom_conditions = create_conditions(fiber_distance_bottom)
 
-    def composite_mask(conditions, fun):
+    def mask_lfold(conditions, fun):
         assert len(conditions) > 0, "Must have at least one condition"
-        # Folds masks together
+        # Left folds masks together using fun
         (
             mask,
             *c,
@@ -61,9 +59,9 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
             mask = fun(mask, condition)
         return mask
 
-    top = composite_mask(top_conditions, np.logical_and)
-    bot = composite_mask(bottom_conditions, np.logical_or)
-    combined = composite_mask([top, bot], np.logical_or)
+    top = mask_lfold(top_conditions, np.logical_and)
+    bot = mask_lfold(bottom_conditions, np.logical_or)
+    combined = mask_lfold([top, bot], np.logical_or)
 
     mask = np.subtract(mask, combined)
 
@@ -93,7 +91,6 @@ def _find_coords(top_bound, bot_bound, img):
         return np.where(mask.any(axis=axis), val, invalid_value)
 
     top_coords = first_nonzero(img[:top_bound, :]).reshape((1, -1))
-    bottom_coords = last_nonzero(
-        img[bot_bound:, :], img.shape[0]).reshape((1, -1))
+    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0]).reshape((1, -1))
 
     return top_coords, bottom_coords

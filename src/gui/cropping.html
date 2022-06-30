@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<script type="text/javascript" src="/eel.js"></script>
+
+<head>
+  <title>Cropping Bounds</title>
+  <link rel="shortcut icon" href="img/icon.png" type="image/x-icon">
+</head>
+
+
+<body>
+  <img src="img/cropped.png">
+  <div class="div1">
+    <label>Width bounds:</label>
+    <textarea>min</textarea>
+    <textarea>max</textarea>
+    <br>
+    <label>Height bounds</label>
+    <textarea>min</textarea>
+    <textarea>max</textarea>
+
+    <button onclick="reload()">Check bounds</button>
+  </div>
+  <script type="text/javascript" src="cropping.js"></script>
+  <br>
+  <button class="continue" onclick="loadNextPage()">
+    Continue
+  </button>
+</body>
+
+
+<link rel="stylesheet" href="css/style.css">
+
+</html>
