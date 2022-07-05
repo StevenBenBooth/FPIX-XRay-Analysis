@@ -12,7 +12,7 @@ class _Config:
         self.tube_radius = 33
 
         # Use width then height
-        self.cropping_bounds = (75, 575, 100, 350)
+        self.cropping_bounds = "[75, 575, 100, 350]"
 
         self.num_wedges = 50
         self.epoxy_low_bound = 40
@@ -59,12 +59,12 @@ class _Config:
 
     def update_params(self, *values):
         (
-            self.num_wedges,
             self.epoxy_low_bound,
             self.highlight_low_bound,
             self.cf_top_bound,
             self.cf_bottom_bound,
             self.cf_thickness,
+            self.num_wedges,
             self.highlight_thickness,
             self.interpolation_thresh,
             self.epoxy_interp_thresh,
@@ -72,12 +72,12 @@ class _Config:
 
     def get_params(self):  # TODO: make this stuff prettier if possible
         return (
-            self.num_wedges,
             self.epoxy_low_bound,
             self.highlight_low_bound,
             self.cf_top_bound,
             self.cf_bottom_bound,
             self.cf_thickness,
+            self.num_wedges,
             self.highlight_thickness,
             self.interpolation_thresh,
             self.epoxy_interp_thresh,
@@ -99,8 +99,7 @@ class _Config:
     def parse_bounds(self, val, name):
         # Converts the JavaScript string representation of the integer bounds into a tuple of integers
         return self.js_cast(
-            lambda x: tuple(
-                map(self.intcast, x.replace("\[|]", "")).split(", ")),
+            lambda x: tuple(map(self.intcast, x.replace("\[|]", "").split(", "))),
             val,
             name,
         )
@@ -193,7 +192,7 @@ class _Config:
 # To take advantage of overwriting __setattr__, we need to use a trick.
 # We use the following trick to replace this module in the system with
 # an instance of the above class, so that our custom __setattr__ behavior gets
-# called whenever we change an attribute of the program.
+# called whenever we change an attribute/value in the module.
 # See the top reply on this StackOverflow for more information on the trick:
 # https://stackoverflow.com/questions/2447353/getattr-on-a-module
 
@@ -201,7 +200,7 @@ class _Config:
 # getters as well as setters, it may be worth replacing this implementation with
 # one using properties. Modules are (roughly) singleton instances of an internal
 # module class. However, properties must exist as attributes of a class, rather
-# than of an instance, so we use this trick to replace the (instance) module with
-# the above class.
+# than of an instance, so we can use this same trick to replace the module (instance)
+# with the above class.
 # Release 0.1.0 has an implementation of these attributes as properties.
 sys.modules["config"] = _Config()
