@@ -1,6 +1,6 @@
 import cv2
 from crust_slices import get_crust_masks
-from stat_tracker import StatTracker
+from statistics import StatTracker
 
 
 def process_highlights(
@@ -42,8 +42,7 @@ def process_highlights(
     assert 0 <= epox_thresh <= 1, "epox_thresh must be between 0 and 1"
 
     result = start_epoxy_mask.copy()
-    masks = get_crust_masks(start_epoxy_mask.shape,
-                            tube_circle, precision, thickness)
+    masks = get_crust_masks(start_epoxy_mask.shape, tube_circle, precision, thickness)
 
     for i in range(len(masks)):
         crust = masks[i]

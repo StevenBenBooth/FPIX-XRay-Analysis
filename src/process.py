@@ -7,12 +7,12 @@ from os.path import join
 import files
 import config
 from image_output import person_output
-from stat_tracker import StatTracker
+from statistics import StatTracker
 from fiber_processing import remove_fiber
 from tube_interpolate import process_highlights
 from tube_analysis import get_bound_circ
 
-import tracker_analysis
+import statistics
 
 
 @eel.expose
@@ -32,12 +32,10 @@ def process():
     coverage_stats, _ = tracker.get_stats()
     df = pd.DataFrame(coverage_stats)
     df.to_excel(join(folder, "Coverage data.xlsx"))
-    tracker_analysis.save_coverage_stats(
+    statistics.save_coverage_stats(
         df.to_numpy(), save_folder=folder, col_count=config.num_wedges
     )
-    tracker_analysis.save_png_to_gif(
-        config.processed_path, join(folder, "processed.gif")
-    )
+    statistics.save_png_to_gif(config.processed_path, join(folder, "processed.gif"))
     # config.save_settings(join(folder, "settings.txt"))
 
 
@@ -57,12 +55,10 @@ def find_epoxy(img, img_tube, save_information=True):
     img_open = cv2.morphologyEx(img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
     img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
 
-    # Roughly identify the epoxy layer
     epoxy_mask = cv2.inRange(
         img_blur, config.epoxy_low_bound, config.highlight_low_bound
     )
 
-    # This function returns information on the tube center
     outer_tube = get_bound_circ(img_tube, config.tube_radius)
     x, y, r = outer_tube
 
@@ -74,7 +70,6 @@ def find_epoxy(img, img_tube, save_information=True):
     # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
     epoxy_mask = np.where(dist <= r, 0, epoxy_mask)
 
-    # Removes the carbon fiber from the epoxy mask
     epoxy_mask = remove_fiber(
         config.cf_bottom_bound,
         config.cf_top_bound,
@@ -84,13 +79,11 @@ def find_epoxy(img, img_tube, save_information=True):
         open_ker,
     )
 
-    # The highlights around the tube may be epoxy or may not. We need to interpolate whether they are or are not,
-    # and to do so we need to extract the highlights
     hightlights_mask = cv2.bitwise_and(
         cv2.inRange(img_blur, config.highlight_low_bound, 255), epoxy_mask
     )
 
-    final_mask = process_highlights(
+    epoxy_mask = process_highlights(
         save_information,
         epoxy_mask,
         hightlights_mask,
@@ -101,4 +94,4 @@ def find_epoxy(img, img_tube, save_information=True):
         config.epoxy_interp_thresh,
         interpolate_close_ker,
     )
-    return final_mask, outer_tube
+    return epoxy_mask, outer_tube
