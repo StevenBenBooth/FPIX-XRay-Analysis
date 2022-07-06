@@ -6,7 +6,7 @@ function returnPath() {
 
 eel.expose(loadNextPage);
 function loadNextPage() {
-  eel.update_tube_sample();
+  eel.update_cropping_sample();
   // Sadly, the window cannot resize itself, so we can't use height/width arguments
-  window.open("set_radius.html", "_self");
+  window.open("cropping.html", "_self");
 }

@@ -1,7 +1,6 @@
 """This module stores the global state, both gui settings and save paths"""
 import sys
 import os
-import numpy as np
 from os.path import join
 from tkinter import messagebox
 from typing import Any
@@ -12,19 +11,16 @@ class _Config:
         self.tube_radius = 33
 
         # Use width then height
-        self.cropping_bounds = "[75, 575, 100, 350]"
+        self.cropping_bounds = [75, 575, 100, 350]
 
-        self.num_wedges = 50
+        # For parameter information, look on the Github wiki. There they are
+        # referred to by their names from the gui, but they're very similar
         self.epoxy_low_bound = 40
-        # highlight low bound is both the lower intensity bound for pixels to be
-        # interpreted as a highlight and the upper bound for them to be interpreted as epoxy
         self.highlight_low_bound = 210
-        self.cf_top_bound = (
-            70  # top_bound < bottom_bound because indexing starts from the top
-        )
-        # These bounds should be set to the y-position of somewhere in the carbon foam layers
+        self.cf_top_bound = 70
         self.cf_bottom_bound = 173
         self.cf_thickness = 7
+        self.num_wedges = 50
         self.highlight_thickness = 9
         self.interpolation_thresh = 0.7
         self.epoxy_interp_thresh = 0
@@ -33,29 +29,23 @@ class _Config:
         self.save_path = None
         self.processed_path = None
 
-    def check_path(self, path):
-        if not os.path.isdir(path):
-            message = "{} does not define a valid folder path".format(path)
-            messagebox.showerror("Not a path", message)
-            raise NotADirectoryError(message)
-        return path
-
     def set_paths(self, base_path):
-        try:
-            base_path = self.check_path(
-                base_path
-            )  # Obvious candidate for a setattr refactor, same as the next two
-            self.slice_path = self.check_path(join(base_path, "Pictures"))
-            self.tube_path = self.check_path(join(base_path, "Tube"))
-            self.processed_path = join(base_path, "Processed")
-            self.save_path = base_path
-        except NotADirectoryError as e:
-            raise e
+        self.base_path = base_path
+        self.slice_path = join(base_path, "Pictures")
+        self.tube_path = join(base_path, "Tube")
+        self.processed_path = join(base_path, "Processed")
+        self.save_path = base_path
 
         try:
             os.mkdir(self.processed_path)
         except FileExistsError:
-            pass
+            raise FileExistsError(
+                (
+                    "The processed path already exists. Running the program again "
+                    "is not guaranteed to overwrite any existing pictures in the "
+                    "processed folder, so it should be deleted before running this line."
+                )
+            )
 
     def update_params(self, *values):
         (
@@ -70,7 +60,10 @@ class _Config:
             self.epoxy_interp_thresh,
         ) = values
 
-    def get_params(self):  # TODO: make this stuff prettier if possible
+    def get_params(
+        self,
+    ):  # TODO: refactor this stuff into an object so that we're not just passing an
+        # array and relying on the order being unchanged (this and the above)
         return (
             self.epoxy_low_bound,
             self.highlight_low_bound,
@@ -83,6 +76,7 @@ class _Config:
             self.epoxy_interp_thresh,
         )
 
+    # TODO: refactor into decorator (?)
     def js_cast(self, fun, val, name):
         assert isinstance(name, str), "The variable name should be a string"
         try:
@@ -97,9 +91,8 @@ class _Config:
         return self.js_cast(float, val, name)
 
     def parse_bounds(self, val, name):
-        # Converts the JavaScript string representation of the integer bounds into a tuple of integers
         return self.js_cast(
-            lambda x: tuple(map(self.intcast, x.replace("\[|]", "").split(", "))),
+            lambda x: tuple(map(self.intcast, x, (name for _ in range(4)))),
             val,
             name,
         )
@@ -165,9 +158,8 @@ class _Config:
         elif __name == "cropping_bounds":
             val = self.parse_bounds(__value, "Cropping bounds")
             left, right, top, bottom = val
-            assert np.any(
-                np.array(map(lambda x: not isinstance(x, int), val))
-            ), "Bounds must be integers"
+            if True in map(lambda x: not isinstance(x, int), val):
+                raise AssertionError("Bounds must be integers")
             assert (
                 top < bottom
             ), "Due to numpy conventions, the top bound must have a lower value than the bottom bound for the image's height"
@@ -175,6 +167,13 @@ class _Config:
             assert (
                 left < right
             ), "The left bound must have a lower value than the right value for image cropping"
+
+        elif __name in ["base_path", "slice_path", "tube_path"]:
+            if not os.path.isdir(__value):
+                message = "{} does not define a valid folder path".format(__value)
+                messagebox.showerror("Not a path", message)
+                raise NotADirectoryError(message)
+            val = __value
 
         if val is not None:
             super().__setattr__(

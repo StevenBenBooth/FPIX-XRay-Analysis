@@ -85,7 +85,7 @@ class StatTracker:
             self.__initialize_coverage()
 
 
-def save_png_to_gif(folder, save_path, duration=30):
+def save_png_to_gif(folder, save_path):
     """
     Combines the images in folder into a gif lasting duration seconds, and saves that gif to save_path
 
@@ -94,8 +94,7 @@ def save_png_to_gif(folder, save_path, duration=30):
     :param duration: Length of output gif in seconds. Defaults to 30.
     """
     assert save_path.endswith(".gif"), "Save path must end in .gif"
-    frames = []
-    with imageio.get_writer("smiling.gif", mode="I") as writer:
+    with imageio.get_writer("smiling.gif", mode="I") as frames:
         for file in os.listdir(folder):
             assert file.endswith(".png") or file.endswith(
                 ".jpg"

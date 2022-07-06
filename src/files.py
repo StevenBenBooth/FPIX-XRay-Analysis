@@ -9,9 +9,9 @@ slices = None
 
 
 def setup(path):
-    config.set_paths(path)
     global slices
     if slices is None:
+        config.set_paths(path)
         slices = _Files(path)
     else:
         raise ValueError("The images should only be set up once")
@@ -45,10 +45,8 @@ class _Files:
         if self.current_slice >= self.slice_total - 1:
             raise StopIteration
         res = (
-            load_and_crop(config.slice_path,
-                          self.slice_imgs[self.current_slice]),
-            load_and_crop(config.tube_path,
-                          self.tube_imgs[self.current_slice]),
+            load_and_crop(config.slice_path, self.slice_imgs[self.current_slice]),
+            load_and_crop(config.tube_path, self.tube_imgs[self.current_slice]),
         )
         self.current_slice += 1
         return res
@@ -58,9 +56,11 @@ class _Files:
 
     def save_img(self, img):
         cv2.imwrite(
-            join(config.processed_path, "slice {}.png".format(
-                self.current_slice)), img
+            join(config.processed_path, "slice {}.png".format(self.current_slice)), img
         )
+
+    def get_cropped_sample(self):
+        return load_and_crop(config.slice_path, self.slice_imgs[0])
 
     def get_tube_sample(self):
         return load_and_crop(config.tube_path, self.tube_imgs[0])

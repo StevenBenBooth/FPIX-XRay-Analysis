@@ -50,3 +50,11 @@ def write_image_sample():
         resource_path("src/gui/img/settings_sample.png"),
         person_output(img, processed_mask, tube_info),
     )
+
+def write_cropping_sample():
+    img = files.slices.get_cropped_sample()
+    cv2.imwrite(
+        resource_path("src/gui/img/crop_sample.png"),
+        img
+    )
+
