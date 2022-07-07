@@ -1,6 +1,7 @@
 # Excludes the sample images, but not the icon
 src/gui/img/tube_sample.png
 src/gui/img/settings_sample.png
+src/gui/img/crop_sample.png
 
 # Ignores build and distribution pyinstaller stuff
 build/

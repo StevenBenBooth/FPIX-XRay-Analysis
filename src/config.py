@@ -1,4 +1,7 @@
-"""This module stores the global state, both gui settings and save paths"""
+"""This module stores the global state, both gui settings and save paths.
+config should not need to import from any of our other modules. If this is done,
+then we are likely introducing multiple sources of global state, which will make
+your life hard"""
 import sys
 import os
 from os.path import join
@@ -9,9 +12,6 @@ from typing import Any
 class _Config:
     def __init__(self):
         self.tube_radius = 33
-
-        # Use width then height
-        self.cropping_bounds = [75, 575, 100, 350]
 
         # For parameter information, look on the Github wiki. There they are
         # referred to by their names from the gui, but they're very similar
@@ -24,12 +24,15 @@ class _Config:
         self.highlight_thickness = 9
         self.interpolation_thresh = 0.7
         self.epoxy_interp_thresh = 0
-        self.slice_path = None
-        self.tube_path = None
-        self.save_path = None
-        self.processed_path = None
+
+        self.paths_set = False
 
     def set_paths(self, base_path):
+        # Ensures that the paths are only set once
+        if self.paths_set:
+            raise AssertionError("The paths should only be set once")
+        self.paths_set = True
+
         self.base_path = base_path
         self.slice_path = join(base_path, "Pictures")
         self.tube_path = join(base_path, "Tube")
@@ -160,13 +163,16 @@ class _Config:
             left, right, top, bottom = val
             if True in map(lambda x: not isinstance(x, int), val):
                 raise AssertionError("Bounds must be integers")
+            h, w = self.image_size
             assert (
-                top < bottom
-            ), "Due to numpy conventions, the top bound must have a lower value than the bottom bound for the image's height"
+                top % h < bottom % h
+            ), "Due to numpy conventions, the top bound must have a lower value than the bottom bound "
+            "for the image's height (if either is negative, this must be true modulo image height)"
 
             assert (
-                left < right
-            ), "The left bound must have a lower value than the right value for image cropping"
+                left % w < right % w
+            ), "Due to numpy conventions, the left bound must have a lower value than the right bound "
+            "for the image's width (if either is negative, this must be true modulo image width)"
 
         elif __name in ["base_path", "slice_path", "tube_path"]:
             if not os.path.isdir(__value):

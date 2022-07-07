@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['src\\gui_driver.py'],
+    ['src\\driver.py'],
     pathex=[],
     binaries=[],
     datas=[],

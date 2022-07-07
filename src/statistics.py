@@ -58,14 +58,14 @@ class StatTracker:
     def __initialize_coverage(self):
         # Setting dtype to np.bool_ makes np interpret the 0's as Falses
         self.coverage_stats = np.zeros(
-            (files.slices.slice_total, config.num_wedges), dtype=np.bool_
+            (files.Files.slice_total, config.num_wedges), dtype=np.bool_
         )
 
     def __initialize_area(self):
-        self.area_stats = np.zeros((files.slices.slice_total,), dtype=np.uint8)
+        self.area_stats = np.zeros((files.Files.slice_total,), dtype=np.uint8)
 
     def update_coverage(self, wedge, value: bool):
-        self.coverage_stats[files.slices.current_slice][wedge] = value
+        self.coverage_stats[files.Files.current_slice][wedge] = value
 
     def update_area(self, slice_index, value):
         self.area_stats[slice_index] = value

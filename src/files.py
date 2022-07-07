@@ -3,16 +3,16 @@ import os
 import cv2
 import config
 
-"""This module contains an iterable for the slices of the scan"""
+"""This module handles file access. We have a bit of a singleton pattern going on,
+where the Files class is an iterable used for the main processing loop"""
 
-slices = None
+Files = None
 
 
 def setup(path):
-    global slices
-    if slices is None:
-        config.set_paths(path)
-        slices = _Files(path)
+    global Files
+    if Files is None:
+        Files = _Files(path)
     else:
         raise ValueError("The images should only be set up once")
 
@@ -26,13 +26,13 @@ def load_and_crop(path, slice):
 
 class _Files:
     def __init__(self, path):
+        print("setting up files")
         config.set_paths(path)
-        self.current_slice = (
-            -1
-        )  # Starts on -1, since the first call to next gets the index-0 index
+        self.current_slice = 0
         self.slice_imgs = os.listdir(config.slice_path)
         self.tube_imgs = os.listdir(config.tube_path)
         self.slice_total = len(self.slice_imgs)
+
         assert self.slice_total == len(
             self.tube_imgs
         ), "There must be the same number of tube images as slice images"
@@ -59,6 +59,10 @@ class _Files:
             join(config.processed_path, "slice {}.png".format(self.current_slice)), img
         )
 
+    def get_img_size(self):
+        # We only need h, w, so we take the first two dimensions
+        return cv2.imread(join(config.slice_path, self.slice_imgs[0])).shape[:2]
+
     def get_cropped_sample(self):
         return load_and_crop(config.slice_path, self.slice_imgs[0])
 
@@ -68,7 +72,7 @@ class _Files:
     def get_image_sample(self):
         center_slice = int(
             self.slice_total / 2
-        )  # The middle slices are more indicitave of the sample scan than the ends
+        )  # The middle slices are more indicative of the sample scan than the ends
         return (
             load_and_crop(config.slice_path, self.slice_imgs[center_slice]),
             load_and_crop(config.tube_path, self.tube_imgs[center_slice]),
