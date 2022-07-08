@@ -25,37 +25,55 @@ def find_epoxy(img, img_tube, save_information=True):
     img_open = cv2.morphologyEx(img_gray, cv2.MORPH_OPEN, open_ker, iterations=1)
     img_blur = cv2.GaussianBlur(img_open, blur_ker, 0)
 
-    epoxy_mask = cv2.inRange(
+    rough_mask = cv2.inRange(
         img_blur, config.epoxy_low_bound, config.highlight_low_bound
     )
 
     outer_tube = get_bound_circ(img_tube, config.tube_radius)
     x, y, r = outer_tube
 
-    # Creates a map that computes the euclidean distance of a pixel position to the identified tube center
-    h, w = epoxy_mask.shape[:2]
-    ys, xs = np.ogrid[0:h, 0:w]
-    dist = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
+    # Creates a map that computes the euclidean distance of a pixel position to the identified tube center (for points close to the tube)
+    h, w = rough_mask.shape[:2]
+    middle_h, middle_w = h // 2, w // 2 
+    top, bottom, left, right = middle_h - r, middle_h + r, middle_w - r, middle_w + r
+    # It should not be the case that middle_h +- r is outside the image
+    ys, xs = np.ogrid[top:bottom, left:right]
+
+    # For points near the tube, we compute the actual distance. For far points, we spare some compute and just set them to have a high distance
+    dist = np.full((h, w), 2*r)
+    dist[top:bottom, left:right] = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
+    
+
+    import pandas as pd
+
+    df = pd.DataFrame(dist)
+    df.to_excel("C:\\Users\\Work\\Desktop\\temp\\dist_test.xlsx")
 
     # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
-    epoxy_mask = np.where(dist <= r, 0, epoxy_mask)
+    no_tube = np.where(dist <= r, 0, rough_mask)
+    print(no_tube == rough_mask)    # Should probably be true in this instance
 
-    epoxy_mask = remove_fiber(
+    df2 = pd.DataFrame(no_tube)
+    df2.to_excel("C:\\Users\\Work\\Desktop\\temp\\tube_remove.xlsx")
+
+    no_fiber = remove_fiber(
         config.cf_bottom_bound,
         config.cf_top_bound,
         config.cf_thickness,
-        epoxy_mask,
+        no_tube,
         fiber_close_ker,
         open_ker,
     )
+    df3 = pd.DataFrame(no_fiber)
+    df3.to_excel("C:\\Users\\Work\\Desktop\\temp\\no_fiber.xlsx")
 
-    hightlights_mask = cv2.bitwise_and(
-        cv2.inRange(img_blur, config.highlight_low_bound, 255), epoxy_mask
+    hightlights_mask = np.logical_and(
+        cv2.inRange(img_blur, config.highlight_low_bound, 255), no_fiber
     )
 
     epoxy_mask = process_highlights(
         save_information,
-        epoxy_mask,
+        no_fiber,
         hightlights_mask,
         outer_tube,
         config.num_wedges,
@@ -64,4 +82,12 @@ def find_epoxy(img, img_tube, save_information=True):
         config.epoxy_interp_thresh,
         interpolate_close_ker,
     )
+    df4 = pd.DateOffset(epoxy_mask)
+    df4.to_excel("C:\\Users\\Work\\Desktop\\temp\\final.xlsx")
+
+    cv2.imwrite("C:\\Users\\Work\\Desktop\\temp\\initial thresh.png", rough_mask)
+    cv2.imwrite("C:\\Users\\Work\\Desktop\\temp\\no tube.png", no_tube)
+    cv2.imwrite("C:\\Users\\Work\\Desktop\\temp\\no fiber.png", no_fiber)
+    cv2.imwrite("C:\\Users\\Work\\Desktop\\temp\\final.png", epoxy_mask)
+
     return epoxy_mask, outer_tube

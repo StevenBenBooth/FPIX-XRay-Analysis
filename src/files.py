@@ -26,7 +26,6 @@ def load_and_crop(path, slice):
 
 class _Files:
     def __init__(self, path):
-        print("setting up files")
         config.set_paths(path)
         self.current_slice = 0
         self.slice_imgs = os.listdir(config.slice_path)

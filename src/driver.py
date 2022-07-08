@@ -1,14 +1,12 @@
 import eel
-import config
-from image_output import write_tube_sample, write_image_sample, write_crop_sample
 import pandas as pd
 from os.path import join
 
 import files
 import config
 import statistics
+import image_output
 from process import find_epoxy
-from image_output import person_output
 
 
 """This module serves as a hub for communication between the python and javascript components,
@@ -45,17 +43,17 @@ def update_params(params):
 
 @eel.expose
 def update_cropping_sample():
-    write_crop_sample()
+    image_output.write_crop_sample()
 
 
 @eel.expose
 def update_tube_sample():
-    write_tube_sample(config.tube_radius)
+    image_output.write_tube_sample(config.tube_radius)
 
 
 @eel.expose
 def update_slice_sample():
-    write_image_sample()
+    image_output.write_image_sample()
 
 
 @eel.expose
@@ -84,10 +82,10 @@ def process():
     folder = config.save_path
     for i, (foam_slice, tube_slice) in enumerate(files.Files):
         epox, circle = find_epoxy(foam_slice, tube_slice)
-        files.slices.save_img(person_output(foam_slice, epox, circle))
+        files.Files.save_img(image_output.person_output(foam_slice, epox, circle))
         if (i + 1) % 5 == 0:
             eel.update(files.Files.get_progress())
-    eel.update(files.slices.get_progress())
+    eel.update(files.Files.get_progress())
 
     # I haven't been doing anything with the area stats. They give information
     # on the distribution along the tube. This could be useful later on if you

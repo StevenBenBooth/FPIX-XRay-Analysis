@@ -4,7 +4,7 @@ import numpy as np
 
 def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     """
-    Processes the image to ignore the carbon fiber in the image classification.
+    Processes the mask to ignore the carbon fiber.
 
     :param int top_bound: A pixel position below all of the upper layer of carbon fiber (numpy conventions)
     :param int bottom_bound: A pixel position above all of the lower layer of carbon fiber (numpy conventions)
@@ -19,18 +19,24 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     assert isinstance(top_bound, int), "top_upper_bound must be an integer"
     assert isinstance(bottom_bound, int), "bottom_lower_bound must be an integer"
     assert isinstance(thickness, int), "thickness must be an integer"
-    rough_mask = np.ones(mask.shape[:2], np.uint8)
+
+    # rough_mask = np.ones(mask.shape, np.uint8)
     rows, cols = mask.shape
 
-    cv2.rectangle(rough_mask, (0, top_bound), (cols, bottom_bound), 0, -1)
-    fiber_parts = cv2.bitwise_and(mask, rough_mask)
-    closed_fiber = cv2.morphologyEx(
-        fiber_parts, cv2.MORPH_CLOSE, close_ker, iterations=4
-    )  # Closes up the fiber parts so the removal works better
-    top_coords, bottom_coords = _find_coords(top_bound, bottom_bound, closed_fiber)
+    # # cv2.rectangle(rough_mask, (0, top_bound), (cols, bottom_bound), 0, -1)
+    # ys, _ = np.ogrid[0:rows, 0:0]
+    # print(ys)
+    # fiber_parts = np.where((ys < top_bound) or (ys > bottom_bound), mask, 0)
+
+    # fiber_parts = cv2.bitwise_and(mask, rough_mask)
+
+    # Closing the image a bit makes it easier to find fiber consistently
+    closed = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, close_ker, iterations=4)
+    top_coords, bottom_coords = _find_coords(top_bound, bottom_bound, closed)
 
     # Creates an array whose values index row position
     row_vals = np.arange(rows).reshape(rows, 1)
+    # TODO: Is it better to use ogrid here?
 
     # Gets the distance of each array position to the fiber top
     fiber_distance_top = np.subtract(row_vals, top_coords)
@@ -85,12 +91,12 @@ def _find_coords(top_bound, bot_bound, img):
 
         # To take advantage of the argmax behavior, we need to flip the array;
         # this way, the first argmax coord will correspond to the last nonzero element in that column
-        # We need to compensate for the effect of this flip
+        # We then subtract this from the axis length to obtain the actual column position
         val = axis_length - np.flip(mask, axis=axis).argmax(axis=axis) - 1
 
-        return np.where(mask.any(axis=axis), val, invalid_value)
+        return np.where(mask.any(axis=axis), val, invalid_value).reshape((1, -1))
 
-    top_coords = first_nonzero(img[:top_bound, :]).reshape((1, -1))
-    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0]).reshape((1, -1))
+    top_coords = first_nonzero(img[:top_bound, :])
+    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0])
 
     return top_coords, bottom_coords

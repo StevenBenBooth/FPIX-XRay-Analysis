@@ -164,13 +164,13 @@ class _Config:
             if True in map(lambda x: not isinstance(x, int), val):
                 raise AssertionError("Bounds must be integers")
             h, w = self.image_size
-            assert (
-                top % h < bottom % h
+            assert (top % (h + 1)) < (
+                bottom % (h + 1)
             ), "Due to numpy conventions, the top bound must have a lower value than the bottom bound "
             "for the image's height (if either is negative, this must be true modulo image height)"
 
-            assert (
-                left % w < right % w
+            assert (left % (w + 1)) < (
+                right % (w + 1)
             ), "Due to numpy conventions, the left bound must have a lower value than the right bound "
             "for the image's width (if either is negative, this must be true modulo image width)"
 
