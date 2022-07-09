@@ -43,16 +43,8 @@ def find_epoxy(img, img_tube, save_information=True):
     dist = np.full((h, w), 2 * r)
     dist[top:bottom, left:right] = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
 
-    # import pandas as pd
-
-    # df = pd.DataFrame(dist)
-    # df.to_excel("C:\\Users\\Work\\Desktop\\temp\\dist_test.xlsx")
-
     # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
     no_tube = np.where(dist <= r, 0, rough_mask)
-
-    df2 = pd.DataFrame(no_tube)
-    df2.to_excel("C:\\Users\\Work\\Desktop\\temp\\tube_remove.xlsx")
 
     no_fiber = remove_fiber(
         config.cf_bottom_bound,
@@ -62,10 +54,8 @@ def find_epoxy(img, img_tube, save_information=True):
         fiber_close_ker,
         open_ker,
     )
-    df3 = pd.DataFrame(no_fiber)
-    df3.to_excel("C:\\Users\\Work\\Desktop\\temp\\no_fiber.xlsx")
 
-    # TODO: this is the bug source
+    # TODO: this is a bug source?
     hightlights_mask = cv2.bitwise_and(
         cv2.inRange(img_blur, config.highlight_low_bound, 255), no_fiber
     )
@@ -81,8 +71,6 @@ def find_epoxy(img, img_tube, save_information=True):
         config.epoxy_interp_thresh,
         interpolate_close_ker,
     )
-    df4 = pd.DateOffset(epoxy_mask)
-    df4.to_excel("C:\\Users\\Work\\Desktop\\temp\\final.xlsx")
 
     cv2.imwrite("C:\\Users\\Work\\Desktop\\temp\\initial thresh.png", rough_mask)
     cv2.imwrite("C:\\Users\\Work\\Desktop\\temp\\no tube.png", no_tube)

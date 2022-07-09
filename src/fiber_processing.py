@@ -65,13 +65,12 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
             mask = fun(mask, condition)
         return mask
 
-    top = mask_lfold(top_conditions, np.logical_and)
-    bot = mask_lfold(bottom_conditions, np.logical_or)
-    combined = mask_lfold([top, bot], np.logical_or)
+    top_mask = mask_lfold(top_conditions, np.logical_and)
+    bottom_mask = mask_lfold(bottom_conditions, np.logical_and)
+    fiber_mask = mask_lfold([top_mask, bottom_mask], np.logical_or)
 
-    assert np.any(combined), "combined better not be all false"
-    # Convert boolean combined array to int, and multiply by 255, since mask is a grayscale image
-    mask = np.subtract(mask, 255 * combined.astype("uint8"))
+    # Mask is a grayscale image, so we convert the boolean 'combined' array
+    mask = np.subtract(mask, 255 * fiber_mask.astype("uint8"))
 
     # Clear little fiber artifacts
     return cv2.morphologyEx(mask, cv2.MORPH_OPEN, open_ker, iterations=1)

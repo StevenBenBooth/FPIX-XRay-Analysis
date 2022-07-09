@@ -44,9 +44,9 @@ class _Config:
         except FileExistsError:
             raise FileExistsError(
                 (
-                    "The processed path already exists. Running the program again "
-                    "is not guaranteed to overwrite any existing pictures in the "
-                    "processed folder, so it should be deleted before running this line."
+                    "The processing path already exists. Running the program again "
+                    "is not guaranteed to overwrite all existing pictures in the "
+                    "processed folder, so it should be deleted before code execution."
                 )
             )
 
