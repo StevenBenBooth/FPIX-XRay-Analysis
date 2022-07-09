@@ -19,7 +19,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-def person_output(img, epoxy_mask, circle):
+def pretty_output(img, epoxy_mask, circle):
     """Takes in the raw image, base color, epoxy mask, and circle to make a nice processed image"""
     height, width, _ = img.shape
     red = np.full((height, width, 3), [0, 0, 255], dtype=np.uint8)
@@ -48,7 +48,7 @@ def write_image_sample():
     processed_mask, tube_info = find_epoxy(img, tube, save_information=False)
     cv2.imwrite(
         resource_path("src/gui/img/settings_sample.png"),
-        person_output(img, processed_mask, tube_info),
+        pretty_output(img, processed_mask, tube_info),
     )
 
 

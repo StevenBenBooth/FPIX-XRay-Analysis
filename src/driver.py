@@ -82,9 +82,10 @@ def process():
     folder = config.save_path
     for i, (foam_slice, tube_slice) in enumerate(files.Files):
         epox, circle = find_epoxy(foam_slice, tube_slice)
-        files.Files.save_img(image_output.person_output(foam_slice, epox, circle))
+        files.Files.save_img(image_output.pretty_output(foam_slice, epox, circle))
         if (i + 1) % 5 == 0:
             eel.update(files.Files.get_progress())
+    # update the number at the end, or else it's very frustrating
     eel.update(files.Files.get_progress())
 
     # I haven't been doing anything with the area stats. They give information
@@ -100,10 +101,5 @@ def process():
     # config.save_settings(join(folder, "settings.txt"))
 
 
-set_path("C:\\Users\\Work\\Desktop\\test data")
-update_bounds([75, -75, 100, -100])
-
 # starting the application
-eel.start(
-    "set_parameters.html", mode="chrome"
-)  # chrome looks nicer, but edge would work on machines without chrome installed
+eel.start("select_folder.html", mode="chrome")

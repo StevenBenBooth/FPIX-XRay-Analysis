@@ -78,4 +78,4 @@ class _Files:
         )
 
     def get_progress(self):
-        return "{}/{} images processed".format(self.current_slice + 1, self.slice_total)
+        return "{}/{} images processed".format(self.current_slice, self.slice_total)

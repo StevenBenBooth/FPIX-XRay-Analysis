@@ -94,14 +94,14 @@ def save_png_to_gif(folder, save_path):
     :param duration: Length of output gif in seconds. Defaults to 30.
     """
     assert save_path.endswith(".gif"), "Save path must end in .gif"
-    with imageio.get_writer("smiling.gif", mode="I") as frames:
+    with imageio.get_writer(save_path, mode="I") as frames:
         for file in os.listdir(folder):
-            assert file.endswith(".png") or file.endswith(
-                ".jpg"
-            ), "Files to be combined must be PNG or JPEG format"
-            new_frame = Image.open(
-                join(folder, file)
-            )  # I've only tried this with png, not jpeg. Not sure if you can mix them
+            # NOTE: cv2 imread accepts more than just these file extensions, but they can be os dependent. See the imread doc for more
+            file_endings = [
+                file.endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".bmp"]
+            ]
+            assert True in file_endings, "Files to be combined must be an image format"
+            new_frame = cv2.imread(join(folder, file), color="RGB")
             frames.append_data(new_frame)
 
 
