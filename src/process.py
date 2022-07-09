@@ -34,24 +34,22 @@ def find_epoxy(img, img_tube, save_information=True):
 
     # Creates a map that computes the euclidean distance of a pixel position to the identified tube center (for points close to the tube)
     h, w = rough_mask.shape[:2]
-    middle_h, middle_w = h // 2, w // 2 
+    middle_h, middle_w = h // 2, w // 2
     top, bottom, left, right = middle_h - r, middle_h + r, middle_w - r, middle_w + r
     # It should not be the case that middle_h +- r is outside the image
     ys, xs = np.ogrid[top:bottom, left:right]
 
     # For points near the tube, we compute the actual distance. For far points, we spare some compute and just set them to have a high distance
-    dist = np.full((h, w), 2*r)
+    dist = np.full((h, w), 2 * r)
     dist[top:bottom, left:right] = np.sqrt((x - xs) ** 2 + (y - ys) ** 2)
-    
 
-    import pandas as pd
+    # import pandas as pd
 
-    df = pd.DataFrame(dist)
-    df.to_excel("C:\\Users\\Work\\Desktop\\temp\\dist_test.xlsx")
+    # df = pd.DataFrame(dist)
+    # df.to_excel("C:\\Users\\Work\\Desktop\\temp\\dist_test.xlsx")
 
     # Sets all points of the mask within the tube circle to 0, removing the tube from the mask
     no_tube = np.where(dist <= r, 0, rough_mask)
-    print(no_tube == rough_mask)    # Should probably be true in this instance
 
     df2 = pd.DataFrame(no_tube)
     df2.to_excel("C:\\Users\\Work\\Desktop\\temp\\tube_remove.xlsx")
@@ -67,7 +65,8 @@ def find_epoxy(img, img_tube, save_information=True):
     df3 = pd.DataFrame(no_fiber)
     df3.to_excel("C:\\Users\\Work\\Desktop\\temp\\no_fiber.xlsx")
 
-    hightlights_mask = np.logical_and(
+    # TODO: this is the bug source
+    hightlights_mask = cv2.bitwise_and(
         cv2.inRange(img_blur, config.highlight_low_bound, 255), no_fiber
     )
 

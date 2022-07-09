@@ -100,7 +100,10 @@ def process():
     # config.save_settings(join(folder, "settings.txt"))
 
 
+set_path("C:\\Users\\Work\\Desktop\\test data")
+update_bounds([75, -75, 100, -100])
+
 # starting the application
 eel.start(
-    "select_folder.html", mode="chrome"
+    "set_parameters.html", mode="chrome"
 )  # chrome looks nicer, but edge would work on machines without chrome installed

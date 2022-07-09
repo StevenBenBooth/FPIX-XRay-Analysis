@@ -34,8 +34,8 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     closed = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, close_ker, iterations=4)
     top_coords, bottom_coords = _find_coords(top_bound, bottom_bound, closed)
 
-    # Creates an array whose values index row position
-    row_vals = np.arange(rows).reshape(rows, 1)
+    # Creates an array whose values index row position. Type must match mask
+    row_vals = np.arange(rows, dtype=np.uint8).reshape(rows, 1)
     # TODO: Is it better to use ogrid here?
 
     # Gets the distance of each array position to the fiber top
@@ -43,16 +43,16 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     # Same for the bottom (flipped sign because we want to remove pixels above bottom_bound (i.e., lower index))
     fiber_distance_bottom = np.subtract(bottom_coords, row_vals)
 
-    def create_conditions(surface_distance_array):
+    def create_conditions(surface_distance_array, coords):
         return [
             surface_distance_array <= thickness,
             surface_distance_array > 0,
-            (top_coords != -1).reshape(1, cols),
+            (coords != -1).reshape(1, cols),
         ]
 
-    top_conditions = create_conditions(fiber_distance_top)
+    top_conditions = create_conditions(fiber_distance_top, top_coords)
 
-    bottom_conditions = create_conditions(fiber_distance_bottom)
+    bottom_conditions = create_conditions(fiber_distance_bottom, bottom_coords)
 
     def mask_lfold(conditions, fun):
         assert len(conditions) > 0, "Must have at least one condition"
@@ -69,7 +69,9 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     bot = mask_lfold(bottom_conditions, np.logical_or)
     combined = mask_lfold([top, bot], np.logical_or)
 
-    mask = np.subtract(mask, combined)
+    assert np.any(combined), "combined better not be all false"
+    # Convert boolean combined array to int, and multiply by 255, since mask is a grayscale image
+    mask = np.subtract(mask, 255 * combined.astype("uint8"))
 
     # Clear little fiber artifacts
     return cv2.morphologyEx(mask, cv2.MORPH_OPEN, open_ker, iterations=1)
@@ -94,9 +96,9 @@ def _find_coords(top_bound, bot_bound, img):
         # We then subtract this from the axis length to obtain the actual column position
         val = axis_length - np.flip(mask, axis=axis).argmax(axis=axis) - 1
 
-        return np.where(mask.any(axis=axis), val, invalid_value).reshape((1, -1))
+        return np.where(mask.any(axis=axis), val, invalid_value)
 
-    top_coords = first_nonzero(img[:top_bound, :])
-    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0])
+    top_coords = first_nonzero(img[:top_bound, :]).reshape((1, -1))
+    bottom_coords = last_nonzero(img[bot_bound:, :], img.shape[0]).reshape((1, -1))
 
     return top_coords, bottom_coords
