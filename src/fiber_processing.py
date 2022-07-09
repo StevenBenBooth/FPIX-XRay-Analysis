@@ -20,15 +20,7 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
     assert isinstance(bottom_bound, int), "bottom_lower_bound must be an integer"
     assert isinstance(thickness, int), "thickness must be an integer"
 
-    # rough_mask = np.ones(mask.shape, np.uint8)
     rows, cols = mask.shape
-
-    # # cv2.rectangle(rough_mask, (0, top_bound), (cols, bottom_bound), 0, -1)
-    # ys, _ = np.ogrid[0:rows, 0:0]
-    # print(ys)
-    # fiber_parts = np.where((ys < top_bound) or (ys > bottom_bound), mask, 0)
-
-    # fiber_parts = cv2.bitwise_and(mask, rough_mask)
 
     # Closing the image a bit makes it easier to find fiber consistently
     closed = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, close_ker, iterations=4)
@@ -36,23 +28,23 @@ def remove_fiber(top_bound, bottom_bound, thickness, mask, close_ker, open_ker):
 
     # Creates an array whose values index row position. Type must match mask
     row_vals = np.arange(rows, dtype=np.uint8).reshape(rows, 1)
-    # TODO: Is it better to use ogrid here?
 
-    # Gets the distance of each array position to the fiber top
-    fiber_distance_top = np.subtract(row_vals, top_coords)
+    # Get distance of each pixel from the top edge of the top CF
+    fiber_distance_to_top = np.subtract(row_vals, top_coords)
     # Same for the bottom (flipped sign because we want to remove pixels above bottom_bound (i.e., lower index))
-    fiber_distance_bottom = np.subtract(bottom_coords, row_vals)
+    fiber_distance_to_bottom = np.subtract(bottom_coords, row_vals)
 
     def create_conditions(surface_distance_array, coords):
+        """Defines our conditions for which pixels are identified as caron fiber"""
         return [
             surface_distance_array <= thickness,
             surface_distance_array > 0,
             (coords != -1).reshape(1, cols),
         ]
 
-    top_conditions = create_conditions(fiber_distance_top, top_coords)
+    top_conditions = create_conditions(fiber_distance_to_top, top_coords)
 
-    bottom_conditions = create_conditions(fiber_distance_bottom, bottom_coords)
+    bottom_conditions = create_conditions(fiber_distance_to_bottom, bottom_coords)
 
     def mask_lfold(conditions, fun):
         assert len(conditions) > 0, "Must have at least one condition"

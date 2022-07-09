@@ -16,23 +16,23 @@ def process_highlights(
 ):
     """
     Classifies the highlights around the tube as either epoxy or not. To do so, it looks in a small pizza-crust slice
-    outwards from the highlight, and checks how much is epoxy and highlight vs nothingness. Currently, epox_thresh is
-    set to 0, so it's really only checking that there isn't too much void in the crust slice.
+    outwards from the highlight, and checks how much is epoxy and highlight vs nothingness. Typically, epox_thresh is
+    set to 0, so this is really only checking that there isn't too much nothingness in the crust slice.
 
     :param bool save_information: whether the stat tracker should record information for this slice
-    :param img start_epoxy_mask: Input of epoxy mask.
-    :param img highlights: Mask of the image highlights, to be classified.
-    :param tuple tube_circle: Contains information about the bounding circle for the tube.
-    :param int precision: How many pizza crust slices to use.
+    :param img start_epoxy_mask: input epoxy mask
+    :param img highlights: mask of the image highlights, to be classified
+    :param tuple tube_circle: contains tube bounding circle information
+    :param int precision: how many pizza crust slices to use
     :param int thickness:
         How thick the crusts should be for the interpolation. If this is too high, you may need to lower thresholds.
-        Too low and you might have holes in the final image for sections with thick highlights.
+        Too low and you might have holes in the final image for cross sections with thick highlights.
     :param float thresh:
         Overall threshold for how much of the stuff in the crust slice must be either epoxy or highlights to classify
         the slice as epoxy. Too high, and you may miss on actual epoxy. Too low and you might get false positives.
     :param float epox_thresh:
         Threshold for how much epoxy must be in crust slice to characterize highlight as epoxy.
-        Often 0 works fine, as the reflections seem to be more extreme around the tube when there's epoxy.
+        0 works fine, as the reflections seem to be more extreme around the tube when there's epoxy.
     :param ker: Kernel for closing small holes at end of analysis.
     :return:
     """

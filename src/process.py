@@ -55,10 +55,7 @@ def find_epoxy(img, img_tube, save_information=True):
         open_ker,
     )
 
-    # TODO: this is a bug source?
-    hightlights_mask = cv2.bitwise_and(
-        cv2.inRange(img_blur, config.highlight_low_bound, 255), no_fiber
-    )
+    hightlights_mask = cv2.inRange(img_blur, config.highlight_low_bound, 255)
 
     epoxy_mask = process_highlights(
         save_information,

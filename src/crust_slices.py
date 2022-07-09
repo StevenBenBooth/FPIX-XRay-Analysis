@@ -5,15 +5,15 @@ import math
 
 def get_crust_masks(img_dim, tube_circle, number_slices, thickness):
     """
-    Loops over the pixels in a box enclosing the tube, characterizing them according to their angle wrt the tube center.
-    Combining the resulting radial slices with an annulus, returns a List of Pizza-crust shaped masks
+    Loops over the pixels in a box enclosing the tube, characterizing them according to their angle with respect to the tube center.
+    Combines these pizza-shaped slices with an annulus, returning a List of pizza crust shaped masks
     Parameters
     ----------
     :param img_dim: 2D array
         Dimensions required for the masks.
     :param tube_circle: tuple (int, int, int)
-        Tuple (x, y, r) containing information about tube outer diameter. (x, y) denotes tube's center in
-        numpy coordinates (note x and y are inconsistent between numpy and cv2), and r denotes the tube's radius in pixels.
+        Tuple (x, y, r) containing information about tube outer diameter. (x, y) denotes tube's center in numpy coordinates 
+        (note x and y are inconsistent between numpy and cv2), and r denotes the tube's radius in pixels.
     :param int number_slices:
         Must be a positive integer. Denotes the number of crusts to slice. ie, 1 would return a full annulus, 2 would
         return two half-annuli, etc.
