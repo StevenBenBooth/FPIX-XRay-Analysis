@@ -2,6 +2,8 @@
 
 Developed for the Cornell CMS Team, 2022. Performs image processing on cross-sections of Carbon foam/fiber and tubing CT scans.
 
+Make sure to check out the Wiki!
+
 To make updates and build your own version of the GUI, you can run 'pyinstaller --clean driver.spec' on the command line (if pyinstaller is not installed, run 'pip install pyinstaller' first).
 
 The structure of this project and releases has been informed by a few sources. I've done my best to follow the best practices described in the following (links leave Github). Apologies for any failures to adhere to these standards.
