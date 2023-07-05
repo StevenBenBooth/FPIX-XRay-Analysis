@@ -14,7 +14,5 @@ The structure of this project and releases has been informed by a few sources. I
 ### Project structure
 * [Python structure and best practices](https://docs.python-guide.org/writing/structure/)
 
-For a high-level explanation of the project, check out the Wiki!
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
